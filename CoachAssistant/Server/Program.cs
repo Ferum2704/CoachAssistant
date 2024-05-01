@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.ResponseCompression;
+using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSwaggerGen();
