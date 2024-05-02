@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240501190637_SeedData")]
+    partial class SeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,14 +55,14 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8e9c9c27-42f0-43e3-8371-caca6737a15c"),
+                            Id = new Guid("7436c1df-e590-41d1-9bed-7ef6ddfb6d34"),
                             ConcurrencyStamp = "1",
                             Name = "Manager",
                             NormalizedName = "Manager"
                         },
                         new
                         {
-                            Id = new Guid("9039ff29-cfdc-49e6-ac97-3a7953174d33"),
+                            Id = new Guid("294b9c01-3082-430c-b043-1b30258246d0"),
                             ConcurrencyStamp = "2",
                             Name = "Coach",
                             NormalizedName = "Coach"
@@ -190,6 +193,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ApplicationUserId")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
@@ -207,8 +211,7 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
-                        .IsUnique()
-                        .HasFilter("[ApplicationUserId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("DomainUser");
 
@@ -677,7 +680,9 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.ApplicationUser", null)
                         .WithOne("DomainUser")
-                        .HasForeignKey("Domain.Entities.DomainUser", "ApplicationUserId");
+                        .HasForeignKey("Domain.Entities.DomainUser", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Match", b =>
