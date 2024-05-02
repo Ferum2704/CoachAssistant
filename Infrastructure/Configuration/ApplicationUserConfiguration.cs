@@ -11,8 +11,7 @@ namespace Infrastructure.Configuration
             builder
                 .HasOne(x => x.DomainUser)
                 .WithOne()
-                .HasForeignKey<DomainUser>(x => x.ApplicationUserId)
-                .IsRequired();
+                .HasForeignKey<DomainUser>(x => x.ApplicationUserId);
         }
     }
 }

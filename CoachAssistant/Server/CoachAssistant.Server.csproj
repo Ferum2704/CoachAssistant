@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Application\Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Client\CoachAssistant.Client.csproj" />
     <ProjectReference Include="..\Shared\CoachAssistant.Shared.csproj" />

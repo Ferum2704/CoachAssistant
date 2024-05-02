@@ -1,4 +1,6 @@
-﻿using Domain.Entities;
+﻿using Application.Abstractions;
+using Domain.Entities;
+using Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +34,11 @@ namespace Infrastructure
             })
             .AddRoles<ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddTransient<IJwtProvider, JwtProvider>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ICurrentUserService, CurrentUserService>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

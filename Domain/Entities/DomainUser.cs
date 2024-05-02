@@ -12,6 +12,6 @@ namespace Domain.Entities
 
         public string PhotoPath { get; set; }
 
-        public Guid ApplicationUserId { get; set; }
+        public Guid? ApplicationUserId { get; set; }
     }
 }
