@@ -11,6 +11,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 @inject IHttpClientService HttpClientService
+@inject SignalRService SignalRService
 
 @code {
     LoginModel user = new();
@@ -25,6 +26,7 @@
 
         await AuthStateProvider.GetAuthenticationStateAsync();
 
-        NavigationManager.NavigateTo("/main");
+        await SignalRService.StartConnectionAsync();
+        NavigationManager.NavigateTo("/add-team-club");
     }
 }

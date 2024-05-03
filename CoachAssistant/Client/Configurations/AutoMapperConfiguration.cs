@@ -1,9 +1,10 @@
-﻿using Application.Mapping;
-using AutoMapper;
+﻿using AutoMapper;
+using CoachAssistant.Client.Entities;
+using CoachAssistant.Shared.ViewModels;
 
-namespace CoachAssistant.Server.Configurations
+namespace CoachAssistant.Client.Configurations
 {
-    internal static class AutoMapperConfiguration
+    public class AutoMapperConfiguration
     {
         private static MapperConfiguration configuration;
 
@@ -16,7 +17,7 @@ namespace CoachAssistant.Server.Configurations
 
         private static void Configure(IMapperConfigurationExpression cfg)
         {
-            ApplicationMappings.ConfigureAutoMapper(cfg);
+            cfg.CreateMap<ClubViewModel, ClubViewEntity>();
         }
     }
 }

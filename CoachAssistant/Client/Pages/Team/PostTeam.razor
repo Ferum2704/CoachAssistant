@@ -1,0 +1,41 @@
+﻿@page "/add-team-club"
+
+<EditForm Model="teamClub" OnValidSubmit="HandleValidSubmit" class="container mt-5">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger" />
+
+    <div class="form-group mb-3">
+        <label for="name" class="form-label">Name:</label>
+        <InputText id="name" class="form-control" @bind-Value="teamClub.Name" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="city" class="form-label">City:</label>
+        <InputText id="city" class="form-control" @bind-Value="teamClub.City" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="region" class="form-label">Region:</label>
+        <InputText id="region" class="form-control" @bind-Value="teamClub.Region" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="stadium" class="form-label">Stadium:</label>
+        <InputText id="stadium" class="form-control" @bind-Value="teamClub.Stadium" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@inject IHttpClientService HttpClientService
+@inject ILocalStorageService LocalStorage
+
+@code {
+    private HubConnection hubConnection;
+    private TeamClubModel teamClub = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await HttpClientService.PostAsync<TeamClubModel>(ApiUrls.PostTeamUrl, teamClub);
+    }
+}

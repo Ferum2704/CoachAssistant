@@ -1,4 +1,4 @@
-﻿namespace CoachAssistant.Server.Api.Models
+﻿namespace CoachAssistant.Shared.Models
 {
     public class TeamClubModel
     {

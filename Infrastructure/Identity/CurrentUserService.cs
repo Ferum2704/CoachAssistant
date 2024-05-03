@@ -1,8 +1,9 @@
 ﻿using Application.Abstractions;
-using Application.Identity;
+using CoachAssistant.Shared;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace Infrastructure.Identity
 {
@@ -18,6 +19,8 @@ namespace Infrastructure.Identity
         }
 
         public string CurrentUserUserName => httpContextAccessor.HttpContext?.User?.Identity?.Name ?? string.Empty;
+
+        public Guid CurrentUserId => new(httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
         public async Task<DomainUser> GetCurrentDomainUserAsync()
         {

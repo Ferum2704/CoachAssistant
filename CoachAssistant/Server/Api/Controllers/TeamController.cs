@@ -1,11 +1,11 @@
-﻿using Application.Features.Clubs;
-using Application.Identity;
-using AutoMapper;
-using CoachAssistant.Server.Api.Models;
-using MediatR;
+﻿using Application.Abstractions;
+using Application.Services.IService;
+using CoachAssistant.Server.Hubs;
+using CoachAssistant.Shared;
+using CoachAssistant.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CoachAssistant.Server.Api.Controllers
 {
@@ -13,23 +13,24 @@ namespace CoachAssistant.Server.Api.Controllers
     [ApiController]
     public class TeamController : ControllerBase
     {
-        private readonly IMapper mapper;
-        private readonly IMediator mediator;
+        private readonly IHubContext<NotificationsHub, INotificationsClient> hubContext;
+        private readonly IClubService clubService;
+        private readonly ICurrentUserService currentUserService;
 
-        public TeamController(IMapper mapper, IMediator mediator)
+        public TeamController(IHubContext<NotificationsHub, INotificationsClient> hubContext, IClubService clubService, ICurrentUserService currentUserService)
         {
-            this.mapper = mapper;
-            this.mediator = mediator;
+            this.hubContext = hubContext;
+            this.clubService = clubService;
+            this.currentUserService = currentUserService;
         }
 
         [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpPost]
         public async Task<IActionResult> PostTeam(TeamClubModel model)
         {
-            var command = mapper.Map<AddTeamClubCommand>(model);
-            command.CoachId = new Guid(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var clubViewModel = await clubService.Add(model);
 
-            await mediator.Publish(command);
+            await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TeamAddedNotification(clubViewModel);
 
             return Ok();
         }

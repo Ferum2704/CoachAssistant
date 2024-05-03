@@ -1,13 +1,12 @@
-﻿using Application.DTOs;
-using CoachAssistant.Shared.Models;
+﻿using CoachAssistant.Shared.Models;
 
 namespace Application.Abstractions
 {
     public interface IUserService
     {
-        Task<IdentityModel> Login(LoginDTO loginModel);
+        Task<IdentityModel> Login(LoginModel loginModel);
 
-        Task<bool> Register(RegistrationDTO registrationModel);
+        Task<bool> Register(RegistrationModel registrationModel);
 
         Task<string> RefreshToken(TokenModel tokensModel);
 

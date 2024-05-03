@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Application.DTOs;
 using CoachAssistant.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +18,7 @@ namespace CoachAssistant.Server.Api.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(LoginDTO loginModel)
+        public async Task<IActionResult> Login(LoginModel loginModel)
         {
             var tokenModel = await userService.Login(loginModel);
 
@@ -33,7 +32,7 @@ namespace CoachAssistant.Server.Api.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register(RegistrationDTO registrationModel)
+        public async Task<IActionResult> Register(RegistrationModel registrationModel)
         {
             var isSuccessful = await userService.Register(registrationModel);
 

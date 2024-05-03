@@ -1,6 +1,5 @@
 ﻿using Application.Abstractions;
-using Application.DTOs;
-using Application.Identity;
+using CoachAssistant.Shared;
 using CoachAssistant.Shared.Models;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +29,7 @@ namespace Infrastructure.Identity
             this.currentUserService = currentUserService;
         }
 
-        public async Task<IdentityModel> Login(LoginDTO userToLogin)
+        public async Task<IdentityModel> Login(LoginModel userToLogin)
         {
             var tokenViewModel = new IdentityModel
             {
@@ -66,7 +65,7 @@ namespace Infrastructure.Identity
             return tokenViewModel;
         }
 
-        public async Task<bool> Register(RegistrationDTO userToRegister)
+        public async Task<bool> Register(RegistrationModel userToRegister)
         {
             var userExists = await userManager.FindByNameAsync(userToRegister.Username);
             if (userExists != null)
@@ -135,7 +134,7 @@ namespace Infrastructure.Identity
             await userManager.UpdateAsync(user);
         }
 
-        private static ApplicationUser InitializeNewUser(RegistrationDTO userToRegister)
+        private static ApplicationUser InitializeNewUser(RegistrationModel userToRegister)
         {
             var newUser = new ApplicationUser
             {

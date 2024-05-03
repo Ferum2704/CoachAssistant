@@ -4,6 +4,7 @@ using CoachAssistant.Server.Hubs;
 using CoachAssistant.Server.OptionsSetup;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
@@ -15,11 +16,28 @@ builder.Services.AddSingleton(AutoMapperConfiguration.ResolveMapper());
 
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsSetup>();
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer();
+.AddJwtBearer(options =>
+{
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) &&
+                (path.StartsWithSegments("/notifications")))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -53,6 +71,7 @@ builder.Services.AddSwaggerGen(option =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -83,7 +102,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapHub<CoachAssistantHub>("/coachassistantHub");
+app.MapHub<NotificationsHub>("notifications");
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 

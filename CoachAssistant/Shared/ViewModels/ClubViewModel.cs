@@ -1,9 +1,9 @@
-﻿using MediatR;
-
-namespace Application.Features.Clubs
+﻿namespace CoachAssistant.Shared.ViewModels
 {
-    public class AddTeamClubCommand : IRequest
+    public class ClubViewModel
     {
+        public Guid Id { get; set; }
+
         public string Name { get; set; }
 
         public string City { get; set; }
@@ -12,6 +12,6 @@ namespace Application.Features.Clubs
 
         public string Stadium { get; set; }
 
-        public Guid CoachId { get; set; }
+        public TeamViewModel Team { get; set; }
     }
 }

@@ -1,7 +1,6 @@
-﻿using Application.Identity;
+﻿using CoachAssistant.Shared;
 using Domain.Entities;
 using Infrastructure.Configuration;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -72,7 +71,7 @@ namespace Infrastructure
                 .Navigation(x => x.DomainUser)
                 .AutoInclude();
 
-            SeedIdentityData(modelBuilder);
+            // SeedIdentityData(modelBuilder);
         }
 
         private static void SeedIdentityData(ModelBuilder modelBuilder)
