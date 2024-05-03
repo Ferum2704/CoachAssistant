@@ -1,10 +1,11 @@
-﻿using Application.Features.Club;
+﻿using Application.Features.Clubs;
 using Application.Identity;
 using AutoMapper;
 using CoachAssistant.Server.Api.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CoachAssistant.Server.Api.Controllers
 {
@@ -26,6 +27,7 @@ namespace CoachAssistant.Server.Api.Controllers
         public async Task<IActionResult> PostTeam(TeamClubModel model)
         {
             var command = mapper.Map<AddTeamClubCommand>(model);
+            command.CoachId = new Guid(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             await mediator.Publish(command);
 

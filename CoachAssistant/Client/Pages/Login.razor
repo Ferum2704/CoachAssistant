@@ -1,0 +1,39 @@
+﻿@page "/login"
+
+<h3>Login</h3>
+<EditForm Model="@user">
+    <InputText @bind-Value="user.Username" />
+    <InputText @bind-Value="user.Password" type="password" />
+    <button type="submit" @onclick="LoginUser">Login</button>
+</EditForm>
+
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+@code {
+    LoginModel user = new();
+
+    async Task LoginUser()
+    {
+        var response = await Http.PostAsJsonAsync("api/coaching-system/identity/login", user);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var identityModel = await response.Content.ReadFromJsonAsync<IdentityModel>();
+            await LocalStorage.SetItemAsync($"{nameof(identityModel.Tokens.AccessToken)}", identityModel.Tokens.AccessToken);
+            await LocalStorage.SetItemAsync($"{nameof(identityModel.Tokens.RefreshToken)}", identityModel.Tokens.RefreshToken);
+            await LocalStorage.SetItemAsync($"{nameof(identityModel.DomainUserId)}", identityModel.DomainUserId);
+
+            await AuthStateProvider.GetAuthenticationStateAsync();
+
+            NavigationManager.NavigateTo("/main");
+        }
+        else
+        {
+            var stringResponse = response.Content.ReadAsStringAsync();
+            Console.WriteLine(stringResponse);
+        }
+    }
+}

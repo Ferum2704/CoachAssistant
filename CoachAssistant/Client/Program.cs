@@ -1,4 +1,6 @@
+using Blazored.LocalStorage;
 using CoachAssistant.Client;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -10,5 +12,8 @@ builder.Services.AddHttpClient("CoachAssistant.ServerAPI", client => client.Base
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("CoachAssistant.ServerAPI"));
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

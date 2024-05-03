@@ -1,4 +1,5 @@
-﻿using Application.Features.Club;
+﻿using Application.Features.Clubs;
+using Application.Mapping;
 using AutoMapper;
 using CoachAssistant.Server.Api.Models;
 
@@ -18,6 +19,8 @@ namespace CoachAssistant.Server.Configurations
         private static void Configure(IMapperConfigurationExpression cfg)
         {
             cfg.CreateMap<TeamClubModel, AddTeamClubCommand>();
+
+            ApplicationMappings.ConfigureAutoMapper(cfg);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Application;
 using CoachAssistant.Server.Configurations;
+using CoachAssistant.Server.Hubs;
 using CoachAssistant.Server.OptionsSetup;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +16,7 @@ builder.Services.AddSingleton(AutoMapperConfiguration.ResolveMapper());
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsSetup>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer();
@@ -81,6 +83,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapHub<CoachAssistantHub>("/coachassistantHub");
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 

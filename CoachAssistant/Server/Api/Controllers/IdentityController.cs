@@ -1,10 +1,10 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
-using AutoMapper;
+using CoachAssistant.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Api.Controllers
+namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/identity/")]
     [ApiController]
@@ -47,7 +47,7 @@ namespace Presentation.Api.Controllers
 
         [HttpPost]
         [Route("refresh")]
-        public async Task<IActionResult> Refresh(TokenDTO tokensModel)
+        public async Task<IActionResult> Refresh(TokenModel tokensModel)
         {
             var newAccessToken = await userService.RefreshToken(tokensModel);
 

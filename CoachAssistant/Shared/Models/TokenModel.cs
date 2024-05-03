@@ -1,6 +1,6 @@
-﻿namespace Application.DTOs
+﻿namespace CoachAssistant.Shared.Models
 {
-    public class TokenDTO
+    public class TokenModel
     {
         public string AccessToken { get; set; }
 

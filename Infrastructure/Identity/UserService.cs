@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.DTOs;
 using Application.Identity;
-using Application.ViewModels;
+using CoachAssistant.Shared.Models;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -30,11 +30,11 @@ namespace Infrastructure.Identity
             this.currentUserService = currentUserService;
         }
 
-        public async Task<TokenViewModel> Login(LoginDTO userToLogin)
+        public async Task<IdentityModel> Login(LoginDTO userToLogin)
         {
-            var tokenViewModel = new TokenViewModel
+            var tokenViewModel = new IdentityModel
             {
-                Tokens = new TokenDTO
+                Tokens = new TokenModel
                 {
                     AccessToken = string.Empty,
                     RefreshToken = string.Empty,
@@ -104,7 +104,7 @@ namespace Infrastructure.Identity
             return true;
         }
 
-        public async Task<string> RefreshToken(TokenDTO tokensModel)
+        public async Task<string> RefreshToken(TokenModel tokensModel)
         {
             var principal = jwtProvider.GetPrincipalFromExpiredToken(tokensModel.AccessToken);
 

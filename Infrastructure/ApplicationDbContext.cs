@@ -77,14 +77,11 @@ namespace Infrastructure
 
         private static void SeedIdentityData(ModelBuilder modelBuilder)
         {
-            var adminRoleId = Guid.NewGuid();
-            var adminId = Guid.NewGuid();
-
             modelBuilder.Entity<ApplicationRole>()
                 .HasData(
                     new ApplicationRole
                     {
-                        Id = adminRoleId,
+                        Id = Guid.NewGuid(),
                         Name = ApplicationUserRole.Manager.ToString(),
                         ConcurrencyStamp = "1",
                         NormalizedName = ApplicationUserRole.Manager.ToString(),

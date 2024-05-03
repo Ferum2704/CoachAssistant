@@ -1,0 +1,35 @@
+﻿@page "/register"
+
+<h3>Register</h3>
+<EditForm Model="@user">
+    <InputText @bind-Value="user.FirstName" />
+    <InputText @bind-Value="user.LastName" />
+    <InputText @bind-Value="user.Username" />
+    <InputText @bind-Value="user.Password" type="password" />
+    <InputSelect @bind-Value="user.Role">
+        <option value="Manager">Manager</option>
+        <option value="Coach">Coach</option>
+    </InputSelect>
+    <button type="submit" @onclick="RegisterUser">Register</button>
+</EditForm>
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+@code {
+    RegistrationModel user = new();
+
+    async Task RegisterUser()
+    {
+        var response = await Http.PostAsJsonAsync("api/coaching-system/identity/register", user);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            Console.WriteLine(response.Content.ReadAsStringAsync());
+        }
+    }
+}
