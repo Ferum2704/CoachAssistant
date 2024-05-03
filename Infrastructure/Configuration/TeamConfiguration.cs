@@ -14,12 +14,6 @@ namespace Infrastructure.Configuration
             builder.Property(t => t.Name).IsRequired();
 
             builder
-                .HasOne(x => x.Coach)
-                .WithOne(x => x.Team)
-                .HasForeignKey<Coach>(x => x.TeamId)
-                .IsRequired();
-
-            builder
                 .HasMany(x => x.Players)
                 .WithOne(x => x.Team)
                 .HasForeignKey(x => x.TeamId)

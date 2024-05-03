@@ -14,8 +14,6 @@ namespace Domain.Entities
 
         public string Stadium { get; set; }
 
-        public Guid TeamId { get; set; }
-
-        public Team Team { get; set; }
+        public Team? Team { get; set; }
     }
 }

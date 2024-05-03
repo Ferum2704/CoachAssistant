@@ -10,7 +10,7 @@ namespace Domain.Entities
 
         public string Surname { get; set; }
 
-        public string PhotoPath { get; set; }
+        public string? PhotoPath { get; set; }
 
         public Guid? ApplicationUserId { get; set; }
     }

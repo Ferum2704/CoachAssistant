@@ -9,6 +9,13 @@ namespace Infrastructure.Configuration
         public void Configure(EntityTypeBuilder<Coach> builder)
         {
             builder.ToTable(nameof(Coach));
+
+            builder
+                .HasOne(x => x.Team)
+                .WithOne(x => x.Coach)
+                .HasForeignKey<Team>(x => x.CoachId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
         }
     }
 }

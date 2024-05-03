@@ -16,7 +16,7 @@ namespace Domain.Entities
 
         public bool IsPresent { get; set; }
 
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
         public IReadOnlyCollection<TrainingMark> TrainingMarks { get; set; }
     }

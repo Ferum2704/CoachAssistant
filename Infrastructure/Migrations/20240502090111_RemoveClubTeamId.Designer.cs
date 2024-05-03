@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240502090111_RemoveClubTeamId")]
+    partial class RemoveClubTeamId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,14 +55,14 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c36cdd18-abc1-46e0-abb4-6a25273bcd01"),
+                            Id = new Guid("0b34bba2-3bd2-4463-856e-f7ee3643b7ad"),
                             ConcurrencyStamp = "1",
                             Name = "Manager",
                             NormalizedName = "Manager"
                         },
                         new
                         {
-                            Id = new Guid("8cc2a5df-df53-4895-bf17-3214fd2f22b2"),
+                            Id = new Guid("6a52c7de-36e9-46d1-9a20-27b346aaa0d4"),
                             ConcurrencyStamp = "2",
                             Name = "Coach",
                             NormalizedName = "Coach"
@@ -194,6 +197,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhotoPath")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Surname")
@@ -402,9 +406,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ClubId")
                         .IsUnique();
 
-                    b.HasIndex("CoachId")
-                        .IsUnique();
-
                     b.ToTable("Team", (string)null);
                 });
 
@@ -512,6 +513,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Note")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("PlayerId")
@@ -635,6 +637,13 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Coach", b =>
                 {
                     b.HasBaseType("Domain.Entities.DomainUser");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasIndex("TeamId")
+                        .IsUnique()
+                        .HasFilter("[TeamId] IS NOT NULL");
 
                     b.ToTable("Coach", (string)null);
                 });
@@ -785,15 +794,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Coach", "Coach")
-                        .WithOne("Team")
-                        .HasForeignKey("Domain.Entities.Team", "CoachId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Club");
-
-                    b.Navigation("Coach");
                 });
 
             modelBuilder.Entity("Domain.Entities.TournamentTeam", b =>
@@ -922,6 +923,14 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("Domain.Entities.Coach", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.Team", "Team")
+                        .WithOne("Coach")
+                        .HasForeignKey("Domain.Entities.Coach", "TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Domain.Entities.Manager", b =>
@@ -957,7 +966,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Club", b =>
                 {
-                    b.Navigation("Team");
+                    b.Navigation("Team")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Criterion", b =>
@@ -991,6 +1001,9 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Team", b =>
                 {
+                    b.Navigation("Coach")
+                        .IsRequired();
+
                     b.Navigation("MatchTeams");
 
                     b.Navigation("Players");
@@ -1015,11 +1028,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.TrainingRecord", b =>
                 {
                     b.Navigation("TrainingMarks");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Coach", b =>
-                {
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Domain.Entities.Player", b =>
