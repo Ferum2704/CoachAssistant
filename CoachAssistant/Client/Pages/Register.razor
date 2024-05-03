@@ -14,22 +14,15 @@
 </EditForm>
 
 @inject NavigationManager NavigationManager
-@inject HttpClient Http
+@inject IHttpClientService HttpClientService
 
 @code {
     RegistrationModel user = new();
 
     async Task RegisterUser()
     {
-        var response = await Http.PostAsJsonAsync("api/coaching-system/identity/register", user);
+        await HttpClientService.PostAsync<RegistrationModel>(ApiUrls.RegisterUrl, user);
 
-        if (response.IsSuccessStatusCode)
-        {
-            NavigationManager.NavigateTo("/login");
-        }
-        else
-        {
-            Console.WriteLine(response.Content.ReadAsStringAsync());
-        }
+        NavigationManager.NavigateTo("/login");
     }
 }
