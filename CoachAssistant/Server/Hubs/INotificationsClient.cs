@@ -9,5 +9,13 @@ namespace CoachAssistant.Server.Hubs
         Task TeamAddedNotification(ClubViewModel club);
 
         Task PlayerAddedNotification(PlayerViewModel player);
+
+        Task TrainingAddedNotification(TrainingViewModel training);
+
+        Task PositionAddedNotification(PositionViewModel position);
+
+        Task CriterionAddedNotification(CriterionViewModel criterion);
+
+        Task PositionCriteriaAddedNotification(PositionCriteriaViewModel positionCriteria);
     }
 }

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace CoachAssistant.Server.Api.Controllers
 {
-    [Route("api/coaching-system/team")]
+    [Route("api/coaching-system/teams")]
     [ApiController]
     public class TeamController : ControllerBase
     {

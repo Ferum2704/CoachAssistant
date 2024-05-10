@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using Domain.Enums;
+using Domain.Interfaces;
 
 namespace Domain.Entities
 {
@@ -7,6 +8,8 @@ namespace Domain.Entities
         public Guid Id { get; set; }
 
         public string Name { get; set; }
+
+        public VerificationState VerificationState { get; set; }
 
         public Guid ClubId { get; set; }
 

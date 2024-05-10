@@ -28,7 +28,7 @@ namespace Application.Services
                 Weight = model.Weight,
                 Height = model.Height,
                 Email = model.Email,
-                TeamId = model.TeamId,
+                TeamId = model.TeamId.Value,
                 PhotoPath = model.PhotoPath
             };
 

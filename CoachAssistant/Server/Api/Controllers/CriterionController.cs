@@ -10,29 +10,28 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace CoachAssistant.Server.Api.Controllers
 {
-    [Route("api/coaching-system/teams/{teamId}/players")]
+    [Route("api/coaching-system/criteria")]
     [ApiController]
-    public class PlayerController : ControllerBase
+    public class CriterionController : ControllerBase
     {
-        private readonly IPlayerService playerService;
+        private readonly ICriterionService criterionService;
         private readonly ICurrentUserService currentUserService;
         private readonly IHubContext<NotificationsHub, INotificationsClient> hubContext;
 
-        public PlayerController(IPlayerService playerService, ICurrentUserService currentUserService, IHubContext<NotificationsHub, INotificationsClient> hubContext)
+        public CriterionController(ICriterionService criterionService, ICurrentUserService currentUserService, IHubContext<NotificationsHub, INotificationsClient> hubContext)
         {
-            this.playerService = playerService;
+            this.criterionService = criterionService;
             this.currentUserService = currentUserService;
             this.hubContext = hubContext;
         }
 
         [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpPost]
-        public async Task<IActionResult> PostPlayer(Guid teamId, PlayerModel model)
+        public async Task<IActionResult> PostCritetion(CriterionModel model)
         {
-            model.TeamId = teamId;
-            var playerViewModel = await playerService.Add(model);
+            var criterionViewModel = await criterionService.Add(model);
 
-            await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).PlayerAddedNotification(playerViewModel);
+            await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).CriterionAddedNotification(criterionViewModel);
 
             return Ok();
         }

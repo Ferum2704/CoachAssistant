@@ -13,6 +13,11 @@ namespace Infrastructure
         private ICoachRepository coachRepository;
         private IClubRepository clubRepository;
         private ITeamRepository teamRepository;
+        private ITrainingRepository trainingRepository;
+        private ITrainingRecordRepository trainingRecordRepository;
+        private IPositionRepository positionRepository;
+        private ICriterionRepository criterionRepository;
+        private IPositionCriteriaRepository positionCriteriaRepository;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -28,6 +33,16 @@ namespace Infrastructure
         public IClubRepository ClubRepository => clubRepository ??= new ClubRepository(context);
 
         public ITeamRepository TeamRepository => teamRepository ??= new TeamRepository(context);
+
+        public ITrainingRepository TrainingRepository => trainingRepository ??= new TrainingRepository(context);
+
+        public ITrainingRecordRepository TrainingRecordRepository => trainingRecordRepository ??= new TrainingRecordRepository(context);
+
+        public IPositionRepository PositionRepository => positionRepository ??= new PositionRepository(context);
+
+        public ICriterionRepository CriterionRepository => criterionRepository ??= new CriterionRepository(context);
+
+        public IPositionCriteriaRepository PositionCriteriaRepository => positionCriteriaRepository ??= new PositionCriteriaRepository(context);
 
         public async Task SaveAsync()
         {

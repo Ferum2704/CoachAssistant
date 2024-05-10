@@ -17,5 +17,7 @@
         public IReadOnlyCollection<MatchLineupPosition> MatchLineupPositions { get; set; }
 
         public IReadOnlyCollection<MatchLineupPositionPlayer> MatchLineupPositionsPlayers { get; set; }
+
+        public IReadOnlyCollection<MatchPlayerAction> MatchPlayerActions { get; set; }
     }
 }

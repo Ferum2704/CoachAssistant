@@ -8,6 +8,10 @@
 
         public static string RegisterUrl => $"{BaseUrl}/identity/register";
 
-        public static string PostTeamUrl => $"{BaseUrl}/team";
+        public static string PostTeamUrl => $"{BaseUrl}/teams";
+
+        public static string PlayerUrl => $"{BaseUrl}/teams/{0}/players";
+
+        public static string GetPostPlayerUrl(Guid teamId) => string.Format(PlayerUrl, teamId);
     }
 }

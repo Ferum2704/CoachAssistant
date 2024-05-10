@@ -14,6 +14,16 @@ namespace Application.Abstractions
 
         ITeamRepository TeamRepository { get; }
 
+        ITrainingRepository TrainingRepository { get; }
+
+        ITrainingRecordRepository TrainingRecordRepository { get; }
+
+        IPositionRepository PositionRepository { get; }
+
+        ICriterionRepository CriterionRepository { get; }
+
+        IPositionCriteriaRepository PositionCriteriaRepository { get; }
+
         Task SaveAsync();
     }
 }

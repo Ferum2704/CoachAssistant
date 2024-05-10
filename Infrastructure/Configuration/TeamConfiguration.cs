@@ -14,6 +14,11 @@ namespace Infrastructure.Configuration
             builder.Property(t => t.Name).IsRequired();
 
             builder
+                .Property(x => x.VerificationState)
+                .HasConversion<string>()
+                .IsRequired();
+
+            builder
                 .HasMany(x => x.Players)
                 .WithOne(x => x.Team)
                 .HasForeignKey(x => x.TeamId)
