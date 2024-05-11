@@ -12,9 +12,9 @@ namespace Infrastructure.Configuration
 
             builder.HasKey(x  => x.Id);
             builder
-                .Property(x => x.ActionType)
-                .HasConversion<string>()
-                .IsRequired();
+                .HasOne(x => x.ActionType)
+                .WithMany()
+                .HasForeignKey(x => x.ActionTypeId);
         }
     }
 }

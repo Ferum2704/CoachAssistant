@@ -1,5 +1,8 @@
-﻿using Application.Services;
+﻿using Application.Abstractions.Lineup;
+using Application.Abstractions.Topsis;
+using Application.Services;
 using Application.Services.IService;
+using Application.Topsis;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -12,6 +15,17 @@ namespace Application
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<ICriterionService, CriterionService>();
+            services.AddScoped<IPositionCriteriaService, PositionCriteriaService>();
+            services.AddScoped<IPositionService, PositionService>();
+            services.AddScoped<ITrainingRecordService, TrainingRecordService>();
+            services.AddScoped<ITrainingService, TrainingService>();
+
+            services.AddScoped<ILineupCalculator, LineupCalculator>();
+            services.AddScoped<ITopsisCalculator, TopsisCalculator>();
+            services.AddScoped<IEstimationNormalizer, EstimationNormalizer>();
+            services.AddScoped<ICriteriaWeightNormalizer, CriteriaWeightNormalizer>();
+            services.AddScoped<IWeightedScoresCalculator, WeightedScoresCalculator>();
 
             return services;
         }

@@ -18,6 +18,14 @@ namespace Infrastructure
         private IPositionRepository positionRepository;
         private ICriterionRepository criterionRepository;
         private IPositionCriteriaRepository positionCriteriaRepository;
+        private ITournamentRepository tournamentRepository;
+        private IMatchRepository matchRepository;
+        private IMatchTeamRepository matchTeamRepository;
+        private IMatchPlayerActionRepository matchPlayerActionRepository;
+        private IMatchLineupPositionRepository matchLineupPositionRepository;
+        private IMatchLineupPositionPlayerRepository matchLineupPositionPlayerRepository;
+        private IActionTypeRepository actionTypeRepository;
+        private ITournamentTeamRepository tournamentTeamRepository;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -43,6 +51,22 @@ namespace Infrastructure
         public ICriterionRepository CriterionRepository => criterionRepository ??= new CriterionRepository(context);
 
         public IPositionCriteriaRepository PositionCriteriaRepository => positionCriteriaRepository ??= new PositionCriteriaRepository(context);
+
+        public ITournamentRepository TournamentRepository => tournamentRepository ??= new TournamentRepository(context);
+
+        public IMatchRepository MatchRepository => matchRepository ??= new MatchRepository(context);
+
+        public IMatchTeamRepository MatchTeamRepository => matchTeamRepository ??= new MatchTeamRepository(context);
+
+        public IMatchPlayerActionRepository MatchPlayerActionRepository => matchPlayerActionRepository ??= new MatchPlayerActionRepository(context);
+
+        public IMatchLineupPositionRepository MatchLineupPositionRepository => matchLineupPositionRepository ??= new MatchLineupPositionRepository(context);
+
+        public IMatchLineupPositionPlayerRepository MatchLineupPositionPlayerRepository => matchLineupPositionPlayerRepository ??= new MatchLineupPositionPlayerRepository(context);
+
+        public IActionTypeRepository ActionTypeRepository => actionTypeRepository ??= new ActionTypeRepository(context);
+
+        public ITournamentTeamRepository TournamentTeamRepository => tournamentTeamRepository ??= new TournamentTeamRepository(context);
 
         public async Task SaveAsync()
         {

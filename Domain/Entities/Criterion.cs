@@ -8,6 +8,8 @@ namespace Domain.Entities
 
         public string Name { get; set; }
 
+        public bool ShouldBeMaximized { get; set; }
+
         public IReadOnlyCollection<TrainingMark> TrainingMarks { get; set; }
 
         public IReadOnlyCollection<Position> Positions { get; set; }

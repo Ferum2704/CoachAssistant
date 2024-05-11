@@ -45,6 +45,8 @@ namespace Infrastructure
 
         public DbSet<Tournament> Tournaments { get; set; }
 
+        public DbSet<ActionType> ActionTypes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -66,6 +68,7 @@ namespace Infrastructure
             modelBuilder.ApplyConfiguration(new MatchTeamConfiguration());
             modelBuilder.ApplyConfiguration(new PositionConfiguration());
             modelBuilder.ApplyConfiguration(new CriterionConfiguration()); 
+            modelBuilder.ApplyConfiguration(new ActionTypeConfiguration());
 
             modelBuilder.Entity<ApplicationUser>()
                 .Navigation(x => x.DomainUser)

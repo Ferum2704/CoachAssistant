@@ -1,5 +1,4 @@
-﻿using Domain.Enums;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 
 namespace Domain.Entities
 {
@@ -15,7 +14,9 @@ namespace Domain.Entities
 
         public Match Match { get; set; }
 
-        public MatchActionType ActionType { get; set; }
+        public Guid ActionTypeId { get; set; }
+
+        public ActionType ActionType { get; set; }
 
         public int ActionNumber { get; set; }
     }
