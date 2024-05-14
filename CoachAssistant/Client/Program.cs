@@ -9,6 +9,7 @@ using CoachAssistant.Shared.ViewModels;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -26,5 +27,6 @@ builder.Services.AddTransient<INotificationHandler<ClubViewModel>, TeamAddedNoti
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<ICurrentTeamProvider, CurrentTeamProvider>();
+builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

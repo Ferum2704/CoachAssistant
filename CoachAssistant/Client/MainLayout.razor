@@ -1,17 +1,38 @@
 ﻿@using CoachAssistant.Client.Pages
 @inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-    <div class="main">
-        <div class="top-row px-4">
-            @Body
-        </div>
-    </div>
-</div>
+<MudLayout>
+    <MudAppBar>
+        <ChildContent>
+            @if (isAuthenticated)
+            {
+                <MudText Typo="Typo.h6" Class="mr-2">Hello, @userName!</MudText>
+                <MudButton OnClick="@Logout">Logout</MudButton>
+            }
+        </ChildContent>
+    </MudAppBar>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @code {
-    // You can add any required C# code here
+    private bool isAuthenticated = false;
+    private string userName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
+        userName = authState.User.Identity.IsAuthenticated ? authState.User.Identity.Name : "Guest";
+    }
+
+    private void Logout()
+    {
+        // Implement your logout logic
+        NavigationManager.NavigateTo("login");
+    }
 }
