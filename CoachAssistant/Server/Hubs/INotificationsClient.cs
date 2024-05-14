@@ -17,5 +17,7 @@ namespace CoachAssistant.Server.Hubs
         Task CriterionAddedNotification(CriterionViewModel criterion);
 
         Task PositionCriteriaAddedNotification(PositionCriteriaViewModel positionCriteria);
+
+        Task TournmanetAddedNotification(TournamentViewModel tournament);
     }
 }

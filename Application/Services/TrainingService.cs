@@ -40,9 +40,11 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<TrainingViewModel> Get(Guid id)
+        public async Task<TrainingViewModel> Get(Guid id)
         {
-            throw new NotImplementedException();
+            var training = await unitOfWork.TrainingRepository.GetByIdAsync(id);
+
+            return mapper.Map<TrainingViewModel>(training);
         }
 
         private async Task InitializeTrainingRecords(Guid teamId, Guid trainingId)

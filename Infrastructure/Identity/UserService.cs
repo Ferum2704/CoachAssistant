@@ -142,8 +142,8 @@ namespace Infrastructure.Identity
                 ConcurrencyStamp = Guid.NewGuid().ToString(),
                 DomainUser = userToRegister.Role switch
                 {
-                    ApplicationUserRole.Manager => new Manager(),
-                    ApplicationUserRole.Coach => new Coach(),
+                    nameof(ApplicationUserRole.Manager) => new Manager(),
+                    nameof(ApplicationUserRole.Coach) => new Coach(),
                     _ => null
                 },
             };

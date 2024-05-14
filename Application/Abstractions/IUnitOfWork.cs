@@ -40,6 +40,8 @@ namespace Application.Abstractions
 
         ITournamentTeamRepository TournamentTeamRepository { get; }
 
+        ITrainingMarkRepository TrainingMarkRepository { get; }
+
         Task SaveAsync();
     }
 }

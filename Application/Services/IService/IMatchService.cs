@@ -3,8 +3,7 @@ using CoachAssistant.Shared.ViewModels;
 
 namespace Application.Services.IService
 {
-    public interface IClubService : IService<TeamClubModel, ClubViewModel>
+    public interface IMatchService : IService<MatchModel, MatchViewModel>
     {
-        Task<ClubViewModel> GetByCoachId(Guid coachId);
     }
 }

@@ -12,7 +12,7 @@
 
         public string Email { get; set; }
 
-        public string PhotoPath { get; set; }
+        public string? PhotoPath { get; set; }
 
         public Guid? TeamId { get; set; }
     }

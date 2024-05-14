@@ -20,6 +20,8 @@ namespace Application
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<ITrainingRecordService, TrainingRecordService>();
             services.AddScoped<ITrainingService, TrainingService>();
+            services.AddScoped<ITournamentService, TournamentService>();
+            services.AddScoped<IMatchService, MatchService>();
 
             services.AddScoped<ILineupCalculator, LineupCalculator>();
             services.AddScoped<ITopsisCalculator, TopsisCalculator>();

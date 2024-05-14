@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
@@ -34,6 +35,15 @@ namespace CoachAssistant.Server.Api.Controllers
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TrainingAddedNotification(trainingViewModel);
 
             return Ok();
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [HttpGet("{trainingId}")]
+        public async Task<IActionResult> GetTraining(Guid trainingId)
+        {
+            var trainingViewModel = await trainingService.Get(trainingId);
+
+            return Ok(trainingViewModel);
         }
     }
 }

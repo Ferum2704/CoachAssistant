@@ -26,6 +26,7 @@ namespace Infrastructure
         private IMatchLineupPositionPlayerRepository matchLineupPositionPlayerRepository;
         private IActionTypeRepository actionTypeRepository;
         private ITournamentTeamRepository tournamentTeamRepository;
+        private ITrainingMarkRepository trainingMarkRepository;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -67,6 +68,8 @@ namespace Infrastructure
         public IActionTypeRepository ActionTypeRepository => actionTypeRepository ??= new ActionTypeRepository(context);
 
         public ITournamentTeamRepository TournamentTeamRepository => tournamentTeamRepository ??= new TournamentTeamRepository(context);
+
+        public ITrainingMarkRepository TrainingMarkRepository => trainingMarkRepository ??= new TrainingMarkRepository(context);
 
         public async Task SaveAsync()
         {

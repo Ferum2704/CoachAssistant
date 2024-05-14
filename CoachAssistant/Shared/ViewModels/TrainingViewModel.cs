@@ -13,5 +13,7 @@
         public float Duration { get; set; }
 
         public Guid TeamId { get; set; }
+
+        public IReadOnlyCollection<TrainingRecordViewModel> TrainingRecords { get; set;}
     }
 }

@@ -53,9 +53,26 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<ClubViewModel> Get(Guid id)
+        public async Task<ClubViewModel> Get(Guid id)
         {
-            throw new NotImplementedException();
+            var club = await unitOfWork.ClubRepository.GetByIdAsync(id);
+            var team = await unitOfWork.TeamRepository.GetByIdAsync(club.Team.Id);
+
+            var clubViewModel = mapper.Map<ClubViewModel>(club);
+            clubViewModel.Team = mapper.Map<TeamViewModel>(team);
+
+            return clubViewModel;
+        }
+
+        public async Task<ClubViewModel> GetByCoachId(Guid coachId)
+        {
+            var team = await unitOfWork.TeamRepository.GetSingleAsync(x => x.CoachId == coachId);
+            var club = await unitOfWork.ClubRepository.GetByIdAsync(team.ClubId);
+
+            var clubViewModel = mapper.Map<ClubViewModel>(club);
+            clubViewModel.Team = mapper.Map<TeamViewModel>(team);
+
+            return clubViewModel;
         }
     }
 }

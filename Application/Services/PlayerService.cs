@@ -35,7 +35,7 @@ namespace Application.Services
             unitOfWork.PlayerRepository.Add(player);
             await unitOfWork.SaveAsync();
 
-            return mapper.Map<PlayerViewModel>(model);
+            return mapper.Map<PlayerViewModel>(player);
         }
 
         public async Task Delete(Guid id)
@@ -82,9 +82,11 @@ namespace Application.Services
             await unitOfWork.SaveAsync();
         }
 
-        public Task<PlayerViewModel> Get(Guid id)
+        public async Task<PlayerViewModel> Get(Guid id)
         {
-            throw new NotImplementedException();
+            var player = await unitOfWork.PlayerRepository.GetByIdAsync(id);
+
+            return mapper.Map<PlayerViewModel>(player);
         }
     }
 }

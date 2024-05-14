@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CoachAssistant.Shared.Models;
+using CoachAssistant.Shared.ViewModels;
 
 namespace Application.Services.IService
 {
-    public interface ITournamentService
+    public interface ITournamentService : IService<TournamentModel, TournamentViewModel>
     {
     }
 }

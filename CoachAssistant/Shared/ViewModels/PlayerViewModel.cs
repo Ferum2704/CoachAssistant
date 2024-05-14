@@ -13,5 +13,9 @@
         public float Weight { get; set; }
 
         public string Email { get; set; }
+
+        public IReadOnlyCollection<TrainingRecordViewModel> TrainingRecords { get; set; }
+
+        public IReadOnlyCollection<MatchPlayerActionViewModel> MatchPlayerActions { get; set; }
     }
 }

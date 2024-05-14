@@ -36,5 +36,14 @@ namespace CoachAssistant.Server.Api.Controllers
 
             return Ok();
         }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [HttpGet("{playerId}")]
+        public async Task<IActionResult> GetPlayer(Guid playerId)
+        {
+            var playerViewModel = await playerService.Get(playerId);
+
+            return Ok(playerViewModel);
+        }
     }
 }

@@ -10,6 +10,6 @@
 
         public string? LastName { get; set; }
 
-        public ApplicationUserRole Role { get; set; }
+        public string Role { get; set; }
     }
 }

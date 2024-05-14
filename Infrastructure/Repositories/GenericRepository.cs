@@ -29,6 +29,13 @@ namespace Infrastructure.Repositories
             return await query.Where(filter).ToListAsync();
         }
 
+        public async Task<TEntity?> GetSingleAsync(Expression<Func<TEntity, bool>>? filter, CancellationToken cancellationToken = default)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            return await dbSet.SingleOrDefaultAsync(filter, cancellationToken);
+        }
+
         public async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             IQueryable<TEntity> query = dbSet;
