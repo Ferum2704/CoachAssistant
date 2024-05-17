@@ -1,9 +1,8 @@
 ﻿using Application.Abstractions;
-using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
-using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared;
+using CoachAssistant.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/teams/{teamId}/players")]
+    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
     [ApiController]
     public class PlayerController : ControllerBase
     {
@@ -25,7 +25,6 @@ namespace CoachAssistant.Server.Api.Controllers
             this.hubContext = hubContext;
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpPost]
         public async Task<IActionResult> PostPlayer(Guid teamId, PlayerModel model)
         {
@@ -37,13 +36,20 @@ namespace CoachAssistant.Server.Api.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpGet("{playerId}")]
-        public async Task<IActionResult> GetPlayer(Guid playerId)
+        public async Task<IActionResult> GetById(Guid playerId)
         {
             var playerViewModel = await playerService.Get(playerId);
 
             return Ok(playerViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetByTeamIdAsync([FromQuery] Guid teamId)
+        {
+            var players = await playerService.GetPlayersByTeamIdAsync(teamId);
+
+            return Ok(players);
         }
     }
 }

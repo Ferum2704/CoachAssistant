@@ -4,6 +4,7 @@ using AutoMapper;
 using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared.ViewModels;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Services
 {
@@ -31,6 +32,7 @@ namespace Application.Services
                 Id = Guid.NewGuid(),
                 Name = club.Name,
                 ClubId = club.Id,
+                VerificationState = VerificationState.NotVerified,
                 CoachId = currentUserService.CurrentUserId
             };
 
@@ -43,9 +45,16 @@ namespace Application.Services
             return clubViewModel;
         }
 
-        public Task Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            var team = await unitOfWork.TeamRepository.GetSingleAsync(x => x.ClubId == id);
+            var club = await unitOfWork.ClubRepository.GetSingleAsync(x => x.Id == id);
+
+            unitOfWork.TeamRepository.Remove(team);
+            await unitOfWork.SaveAsync();
+
+            unitOfWork.ClubRepository.Remove(club);
+            await unitOfWork.SaveAsync();
         }
 
         public Task Edit(Guid id, TeamClubModel model)
@@ -64,9 +73,11 @@ namespace Application.Services
             return clubViewModel;
         }
 
-        public Task<IReadOnlyCollection<ClubViewModel>> GetAll()
+        public async Task<IReadOnlyCollection<ClubViewModel>> GetAll()
         {
-            throw new NotImplementedException();
+            var clubs = await unitOfWork.ClubRepository.GetAsync();
+
+            return mapper.Map<IReadOnlyCollection<ClubViewModel>>(clubs);
         }
 
         public async Task<ClubViewModel> GetByCoachId(Guid coachId)

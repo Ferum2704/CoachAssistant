@@ -43,5 +43,23 @@ namespace CoachAssistant.Server.Api.Controllers
 
             return Ok(teamViewModel);
         }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var teams = await clubService.GetAll();
+
+            return Ok(teams);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [HttpGet]
+        public async Task<IActionResult> DeleteClub(Guid clubId)
+        {
+            await clubService.Delete(clubId);
+
+            return Ok();
+        }
     }
 }

@@ -89,9 +89,18 @@ namespace Application.Services
             return mapper.Map<PlayerViewModel>(player);
         }
 
-        public Task<IReadOnlyCollection<PlayerViewModel>> GetAll()
+        public async Task<IReadOnlyCollection<PlayerViewModel>> GetAll()
         {
-            throw new NotImplementedException();
+            var players = await unitOfWork.PlayerRepository.GetAsync();
+
+            return mapper.Map<IReadOnlyCollection<PlayerViewModel>>(players);
+        }
+
+        public async Task<IReadOnlyCollection<PlayerViewModel>> GetPlayersByTeamIdAsync(Guid teamId)
+        {
+            var players = await unitOfWork.PlayerRepository.GetAsync(x => x.TeamId == teamId);
+
+            return mapper.Map<IReadOnlyCollection<PlayerViewModel>>(players);
         }
     }
 }
