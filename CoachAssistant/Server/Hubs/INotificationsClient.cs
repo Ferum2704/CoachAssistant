@@ -23,5 +23,7 @@ namespace CoachAssistant.Server.Hubs
         Task TournamentTeamAddedNotification(TournamentTeamViewModel tournamentTeam);
 
         Task TrainingMarkAddedNotification(TrainingMarkViewModel trainingMark);
+
+        Task MatchPlayerActionAddedNotification(MatchPlayerActionViewModel matchPlayerAction);
     }
 }

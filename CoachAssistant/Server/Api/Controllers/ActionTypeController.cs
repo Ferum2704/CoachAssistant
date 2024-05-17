@@ -38,11 +38,11 @@ namespace CoachAssistant.Server.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetActionTypes(ActionTypeModel model)
+        public async Task<IActionResult> GetActionTypes()
         {
-            var actionTypeViewModel = await actionTypeService.Get();
+            var actionTypes = await actionTypeService.GetAll();
 
-            return Ok(actionTypeViewModel);
+            return Ok(actionTypes);
         }
     }
 }

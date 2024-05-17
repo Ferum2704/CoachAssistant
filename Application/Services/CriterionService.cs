@@ -43,9 +43,11 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyCollection<CriterionViewModel>> GetAll()
+        public async Task<IReadOnlyCollection<CriterionViewModel>> GetAll()
         {
-            throw new NotImplementedException();
+            var criteria = await unitOfWork.CriterionRepository.GetAsync();
+
+            return mapper.Map<IReadOnlyCollection<CriterionViewModel>>(criteria);
         }
     }
 }

@@ -23,6 +23,11 @@ namespace Application
             services.AddScoped<ITrainingService, TrainingService>();
             services.AddScoped<ITournamentService, TournamentService>();
             services.AddScoped<IMatchService, MatchService>();
+            services.AddScoped<ITournamentTeamService, TournamentTeamService>();
+            services.AddScoped<IMatchTeamService, MatchTeamService>();
+            services.AddScoped<IActionTypeService, ActionTypeService>();
+            services.AddScoped<IMatchPlayerActionService, MatchPlayerActionService>();
+            services.AddScoped<ITrainingMarkService, TrainingMarkService>();
 
             services.AddScoped<ILineupCalculator, LineupCalculator>();
             services.AddScoped<ITopsisCalculator, TopsisCalculator>();

@@ -44,9 +44,11 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyCollection<ActionTypeViewModel>> GetAll()
+        public async Task<IReadOnlyCollection<ActionTypeViewModel>> GetAll()
         {
-            throw new NotImplementedException();
+            var actionTypes = await unitOfWork.ActionTypeRepository.GetAsync();
+
+            return mapper.Map<IReadOnlyCollection<ActionTypeViewModel>>(actionTypes);
         }
     }
 }

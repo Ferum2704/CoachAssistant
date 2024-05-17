@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/positions")]
+    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
     [ApiController]
     public class PositionController : ControllerBase
     {
@@ -17,14 +18,16 @@ namespace CoachAssistant.Server.Api.Controllers
         private readonly ICurrentUserService currentUserService;
         private readonly IHubContext<NotificationsHub, INotificationsClient> hubContext;
 
-        public PositionController(IHubContext<NotificationsHub, INotificationsClient> hubContext, ICurrentUserService currentUserService, IPositionService positionService)
+        public PositionController(
+            IHubContext<NotificationsHub, INotificationsClient> hubContext, 
+            ICurrentUserService currentUserService, 
+            IPositionService positionService)
         {
             this.hubContext = hubContext;
             this.currentUserService = currentUserService;
             this.positionService = positionService;
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpPost]
         public async Task<IActionResult> PostPosition(PositionModel model)
         {
@@ -33,6 +36,14 @@ namespace CoachAssistant.Server.Api.Controllers
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).PositionAddedNotification(positionViewModel);
 
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var positions = await positionService.GetAll();
+
+            return Ok(positions);
         }
     }
 }

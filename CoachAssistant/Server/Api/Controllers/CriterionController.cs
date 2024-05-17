@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/criteria")]
+    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
     [ApiController]
     public class CriterionController : ControllerBase
     {
@@ -18,14 +19,16 @@ namespace CoachAssistant.Server.Api.Controllers
         private readonly ICurrentUserService currentUserService;
         private readonly IHubContext<NotificationsHub, INotificationsClient> hubContext;
 
-        public CriterionController(ICriterionService criterionService, ICurrentUserService currentUserService, IHubContext<NotificationsHub, INotificationsClient> hubContext)
+        public CriterionController(
+            ICriterionService criterionService, 
+            ICurrentUserService currentUserService, 
+            IHubContext<NotificationsHub, INotificationsClient> hubContext)
         {
             this.criterionService = criterionService;
             this.currentUserService = currentUserService;
             this.hubContext = hubContext;
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpPost]
         public async Task<IActionResult> PostCritetion(CriterionModel model)
         {
@@ -34,6 +37,14 @@ namespace CoachAssistant.Server.Api.Controllers
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).CriterionAddedNotification(criterionViewModel);
 
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var criteria = await criterionService.GetAll();
+
+            return Ok(criteria);
         }
     }
 }
