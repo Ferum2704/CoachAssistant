@@ -18,6 +18,10 @@ namespace CoachAssistant.Server.Hubs
 
         Task PositionCriteriaAddedNotification(PositionCriteriaViewModel positionCriteria);
 
-        Task TournmanetAddedNotification(TournamentViewModel tournament);
+        Task TournamentAddedNotification(TournamentViewModel tournament);
+
+        Task TournamentTeamAddedNotification(TournamentTeamViewModel tournamentTeam);
+
+        Task TrainingMarkAddedNotification(TrainingMarkViewModel trainingMark);
     }
 }

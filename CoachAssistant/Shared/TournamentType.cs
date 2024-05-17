@@ -1,6 +1,6 @@
-﻿namespace Domain.Enums
+﻿namespace CoachAssistant.Shared
 {
-    public enum MatchType
+    public enum TournamentType
     {
         Friendly,
         LocalLeague,

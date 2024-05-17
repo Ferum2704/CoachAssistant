@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Lineup;
+﻿using Application.Abstractions;
+using Application.Abstractions.Lineup;
 using Application.Abstractions.Topsis;
 using Application.Services;
 using Application.Services.IService;
@@ -28,6 +29,8 @@ namespace Application
             services.AddScoped<IEstimationNormalizer, EstimationNormalizer>();
             services.AddScoped<ICriteriaWeightNormalizer, CriteriaWeightNormalizer>();
             services.AddScoped<IWeightedScoresCalculator, WeightedScoresCalculator>();
+
+            services.AddScoped<ITournamentMatchesGenerator, TournamentMatchesGenerator>();
 
             return services;
         }

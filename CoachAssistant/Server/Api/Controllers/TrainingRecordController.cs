@@ -1,12 +1,16 @@
 ﻿using Application.Abstractions;
+using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
+using CoachAssistant.Shared;
+using CoachAssistant.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoachAssistant.Server.Api.Controllers
 {
-    [Route("api/coaching-system/trainings/{trainingId}/trainingRecords")]
+    [Route("api/coaching-system/trainingRecords")]
     [ApiController]
     public class TrainingRecordController : ControllerBase
     {
@@ -19,6 +23,23 @@ namespace CoachAssistant.Server.Api.Controllers
             this.hubContext = hubContext;
             this.currentUserService = currentUserService;
             this.trainingRecordService = trainingRecordService;
+        }
+
+        [HttpPut("{trainingRecordId}")]
+        public async Task<IActionResult> PutRecord(Guid trainingRecordId, TrainingRecordModel model)
+        {
+            await trainingRecordService.Edit(trainingRecordId, model);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [HttpGet("{trainingRecordId}")]
+        public async Task<IActionResult> GetTrainingRecord(Guid trainingRecordId)
+        {
+            var trainingRecordViewModel = await trainingRecordService.Get(trainingRecordId);
+
+            return Ok(trainingRecordViewModel);
         }
     }
 }

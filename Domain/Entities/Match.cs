@@ -1,5 +1,4 @@
 ﻿using Domain.Interfaces;
-using MatchType = Domain.Enums.MatchType;
 
 namespace Domain.Entities
 {

@@ -12,6 +12,8 @@ namespace Application.Abstractions.IRepository
 
         void Add(TEntity entity);
 
+        void AddRange(IEnumerable<TEntity> entities);
+
         void Update(TEntity entity);
 
         void Remove(TEntity entity);

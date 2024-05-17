@@ -31,9 +31,27 @@ namespace CoachAssistant.Server.Api.Controllers
         {
             var tournamentViewModel = await tournamentService.Add(model);
 
-            await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TournmanetAddedNotification(tournamentViewModel);
+            await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TournamentAddedNotification(tournamentViewModel);
 
             return Ok();
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpPost("{tournamentId}/matches")]
+        public async Task<IActionResult> PostTournamentMatches(Guid tournamentId)
+        {
+            var tournament = await tournamentService.GenerateTournamentMatches(tournamentId);
+
+            return Ok(tournament);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)},{nameof(ApplicationUserRole.Manager)}")]
+        [HttpGet("{tournamentId}")]
+        public async Task<IActionResult> GetTournament(Guid tournamentId)
+        {
+            var tournament = await tournamentService.Get(tournamentId);
+
+            return Ok(tournament);
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿namespace CoachAssistant.Shared.Models
 {
-    public class TournamentModel
+    public class ActionTypeModel
     {
         public string Name { get; set; }
 
-        public TournamentType TournamentType { get; set; }
+        public double BenchmarkValue { get; set; }
     }
 }

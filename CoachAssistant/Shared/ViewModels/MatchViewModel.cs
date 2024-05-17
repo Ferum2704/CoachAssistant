@@ -11,5 +11,7 @@
         public MatchType MatchType { get; set; }
 
         public Guid TournamentId { get; set; }
+
+        public IReadOnlyCollection<MatchTeamViewModel> MatchTeams { get; set; }
     }
 }

@@ -12,10 +12,6 @@ namespace Infrastructure.Configuration
 
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Location).IsRequired();
-            builder
-                .Property(x => x.MatchType)
-                .HasConversion<string>()
-                .IsRequired();
 
             builder
                 .HasMany(x => x.PlayerActions)

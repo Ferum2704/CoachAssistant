@@ -45,6 +45,8 @@ namespace Infrastructure.Repositories
 
         public void Add(TEntity entity) => dbSet.Add(entity);
 
+        public void AddRange(IEnumerable<TEntity> entities) => dbSet.AddRange(entities);
+
         public void Remove(TEntity entity) => dbSet.Remove(entity);
 
         public void Update(TEntity entity) => dbSet.Update(entity);

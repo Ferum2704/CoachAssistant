@@ -12,6 +12,10 @@ namespace Infrastructure.Configuration
 
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Name);
+            builder
+                .Property(x => x.TournamentType)
+                .HasConversion<string>()
+                .IsRequired();
 
             builder
                 .HasMany(x => x.Matches)

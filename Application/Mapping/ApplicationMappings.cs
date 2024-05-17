@@ -24,6 +24,27 @@ namespace Application.Mapping
             cfg.CreateMap<Training, TrainingViewModel>();
             cfg.CreateMap<TrainingRecord, TrainingRecordViewModel>();
             cfg.CreateMap<TrainingMark, TrainingMarkViewModel>();
+            cfg.CreateMap<TrainingMarkModel, TrainingMark>()
+                .ForMember(x => x.Id, act => act.MapFrom(x => Guid.NewGuid()))
+                .ForMember(x => x.Criterion, act => act.Ignore())
+                .ForMember(x => x.TrainingRecord, act => act.Ignore());
+
+            cfg.CreateMap<TournamentModel, Tournament>()
+                .ForMember(x => x.Id, act => act.MapFrom(x => Guid.NewGuid()))
+                .ForMember(x => x.TournamentTeams, act => act.Ignore())
+                .ForMember(x => x.Teams, act => act.Ignore())
+                .ForMember(x => x.Matches, act => act.Ignore());
+            cfg.CreateMap<Tournament, TournamentViewModel>();
+
+            cfg.CreateMap<TournamentTeamModel, TournamentTeam>()
+                .ForMember(x => x.Id, act => act.MapFrom(x => Guid.NewGuid()))
+                .ForMember(x => x.Tournament, act => act.Ignore())
+                .ForMember(x => x.Team, act => act.Ignore());
+            cfg.CreateMap<TournamentTeam, TournamentTeamViewModel>();
+
+            cfg.CreateMap<Match, MatchViewModel>();
+
+            cfg.CreateMap<MatchTeam, MatchTeamViewModel>();
         }
     }
 }
