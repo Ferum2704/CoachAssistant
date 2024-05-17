@@ -10,12 +10,17 @@ namespace Application.Services
     public class PlayerService : IPlayerService
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly ITrainingRecordService trainingRecordService;
         private readonly IMapper mapper;
 
-        public PlayerService(IUnitOfWork unitOfWork, IMapper mapper)
+        public PlayerService(
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            ITrainingRecordService trainingRecordService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
+            this.trainingRecordService = trainingRecordService;
         }
 
         public async Task<PlayerViewModel> Add(PlayerModel model)
@@ -44,9 +49,27 @@ namespace Application.Services
 
             if (player is not null)
             {
+                var trainingRecords = await unitOfWork.TrainingRecordRepository.GetAsync(x => x.PlayerId == player.Id);
+                var matchActions = await unitOfWork.MatchPlayerActionRepository.GetAsync(x => x.PlayerId == player.Id);
+                var positions = await unitOfWork.MatchLineupPositionPlayerRepository.GetAsync(x => x.PlayerId == id);
+
+                await trainingRecordService.DeleteBulk(trainingRecords.Select(x => x.Id).ToList());
+                unitOfWork.MatchPlayerActionRepository.RemoveRange(matchActions);
+                unitOfWork.MatchLineupPositionPlayerRepository.RemoveRange(positions);
+
                 unitOfWork.PlayerRepository.Remove(player);
                 await unitOfWork.SaveAsync();
             }
+        }
+
+        public Task DeleteBulk<TEntity>(Func<TEntity, bool> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteBulk(IReadOnlyCollection<Guid> IDs)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task Edit(Guid id, PlayerModel model)

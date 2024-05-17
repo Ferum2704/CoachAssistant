@@ -49,6 +49,8 @@ namespace Infrastructure.Repositories
 
         public void Remove(TEntity entity) => dbSet.Remove(entity);
 
+        public void RemoveRange(IEnumerable<TEntity> entities) => dbSet.RemoveRange(entities);
+
         public void Update(TEntity entity) => dbSet.Update(entity);
     }
 }

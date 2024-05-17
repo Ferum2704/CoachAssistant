@@ -54,7 +54,7 @@ namespace CoachAssistant.Server.Api.Controllers
         }
 
         [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
-        [HttpGet]
+        [HttpDelete("{clubId}")]
         public async Task<IActionResult> DeleteClub(Guid clubId)
         {
             await clubService.Delete(clubId);

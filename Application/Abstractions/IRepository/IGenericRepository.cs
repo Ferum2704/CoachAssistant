@@ -18,6 +18,8 @@ namespace Application.Abstractions.IRepository
 
         void Remove(TEntity entity);
 
+        void RemoveRange(IEnumerable<TEntity> entities);
+
         Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }

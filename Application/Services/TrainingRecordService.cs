@@ -27,6 +27,17 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
+        public async Task DeleteBulk(IReadOnlyCollection<Guid> IDs)
+        {
+            var trainingMarks = await unitOfWork.TrainingMarkRepository.GetAsync(x => IDs.Contains(x.TrainingRecordId));
+            var trainingRecords = await unitOfWork.TrainingRecordRepository.GetAsync(x => IDs.Contains(x.Id));
+
+            unitOfWork.TrainingMarkRepository.RemoveRange(trainingMarks);
+            unitOfWork.TrainingRecordRepository.RemoveRange(trainingRecords);
+
+            await unitOfWork.SaveAsync();
+        }
+
         public async Task Edit(Guid id, TrainingRecordModel model)
         {
             var trainingRecord = await unitOfWork.TrainingRecordRepository.GetByIdAsync(id);

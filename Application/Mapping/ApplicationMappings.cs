@@ -45,6 +45,11 @@ namespace Application.Mapping
             cfg.CreateMap<Match, MatchViewModel>();
 
             cfg.CreateMap<MatchTeam, MatchTeamViewModel>();
+
+            cfg.CreateMap<PositionModel, Position>();
+            cfg.CreateMap<Position, PositionViewModel>();
+            cfg.CreateMap<CriterionModel, Criterion>();
+            cfg.CreateMap<Criterion, CriterionViewModel>();
         }
     }
 }

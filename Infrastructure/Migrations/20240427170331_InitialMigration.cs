@@ -12,6 +12,22 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Club",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Region = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Stadium = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Club", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -52,21 +68,7 @@ namespace Infrastructure.Migrations
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Club",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Region = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Stadium = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Club", x => x.Id);
-                });
+
 
             migrationBuilder.CreateTable(
                 name: "Position",

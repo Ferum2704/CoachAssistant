@@ -11,5 +11,7 @@
         Task<IReadOnlyCollection<TResult>> GetAll();
 
         Task Delete(Guid id);
+
+        Task DeleteBulk(IReadOnlyCollection<Guid> IDs);
     }
 }

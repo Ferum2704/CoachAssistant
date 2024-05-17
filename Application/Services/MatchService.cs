@@ -27,6 +27,16 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
+        public Task DeleteBulk<TEntity>(Func<TEntity, bool> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteBulk(IReadOnlyCollection<Guid> IDs)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task Edit(Guid id, MatchModel model)
         {
             throw new NotImplementedException();

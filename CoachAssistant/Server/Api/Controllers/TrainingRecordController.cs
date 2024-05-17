@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace CoachAssistant.Server.Api.Controllers
 {
+    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
     [Route("api/coaching-system/trainingRecords")]
     [ApiController]
     public class TrainingRecordController : ControllerBase
@@ -33,7 +33,6 @@ namespace CoachAssistant.Server.Api.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpGet("{trainingRecordId}")]
         public async Task<IActionResult> GetTrainingRecord(Guid trainingRecordId)
         {

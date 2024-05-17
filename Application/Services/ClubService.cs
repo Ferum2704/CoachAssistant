@@ -13,12 +13,16 @@ namespace Application.Services
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly ICurrentUserService currentUserService;
+        private readonly IPlayerService playerService;
+        private readonly ITrainingService trainingService;
 
-        public ClubService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+        public ClubService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, IPlayerService playerService, ITrainingService trainingService)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.currentUserService = currentUserService;
+            this.playerService = playerService;
+            this.trainingService = trainingService;
         }
 
         public async Task<ClubViewModel> Add(TeamClubModel model)
@@ -50,11 +54,32 @@ namespace Application.Services
             var team = await unitOfWork.TeamRepository.GetSingleAsync(x => x.ClubId == id);
             var club = await unitOfWork.ClubRepository.GetSingleAsync(x => x.Id == id);
 
+            var players = await unitOfWork.PlayerRepository.GetAsync(x => x.TeamId == team.Id);
+            foreach (var player in players)
+            {
+                await playerService.Delete(player.Id);
+            }
+
+            var trainings = await unitOfWork.TrainingRepository.GetAsync(x => x.TeamId == team.Id);
+            foreach (var training in trainings)
+            {
+                await trainingService.Delete(training.Id);
+            }
+
             unitOfWork.TeamRepository.Remove(team);
-            await unitOfWork.SaveAsync();
 
             unitOfWork.ClubRepository.Remove(club);
             await unitOfWork.SaveAsync();
+        }
+
+        public Task DeleteBulk<TEntity>(Func<TEntity, bool> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteBulk(IReadOnlyCollection<Guid> IDs)
+        {
+            throw new NotImplementedException();
         }
 
         public Task Edit(Guid id, TeamClubModel model)
