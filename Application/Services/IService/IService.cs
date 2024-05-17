@@ -8,6 +8,8 @@
 
         Task<TResult> Get(Guid id);
 
+        Task<IReadOnlyCollection<TResult>> GetAll();
+
         Task Delete(Guid id);
     }
 }

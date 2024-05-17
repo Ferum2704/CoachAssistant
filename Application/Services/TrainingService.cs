@@ -47,6 +47,11 @@ namespace Application.Services
             return mapper.Map<TrainingViewModel>(training);
         }
 
+        public Task<IReadOnlyCollection<TrainingViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task InitializeTrainingRecords(Guid teamId, Guid trainingId)
         {
             var players = await unitOfWork.PlayerRepository.GetAsync(x => x.TeamId ==  teamId);

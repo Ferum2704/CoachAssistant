@@ -42,5 +42,10 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<IReadOnlyCollection<PositionCriteriaViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -42,5 +42,10 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<IReadOnlyCollection<TrainingMarkViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

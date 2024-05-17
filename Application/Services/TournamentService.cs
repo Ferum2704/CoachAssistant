@@ -55,5 +55,10 @@ namespace Application.Services
 
             return mapper.Map<TournamentViewModel>(tournament);
         }
+
+        public Task<IReadOnlyCollection<TournamentViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

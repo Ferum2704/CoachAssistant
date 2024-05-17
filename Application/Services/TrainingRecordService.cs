@@ -53,5 +53,10 @@ namespace Application.Services
 
             return mapper.Map<TrainingRecordViewModel>(trainingRecord);
         }
+
+        public Task<IReadOnlyCollection<TrainingRecordViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

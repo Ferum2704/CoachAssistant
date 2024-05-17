@@ -64,6 +64,11 @@ namespace Application.Services
             return clubViewModel;
         }
 
+        public Task<IReadOnlyCollection<ClubViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<ClubViewModel> GetByCoachId(Guid coachId)
         {
             var team = await unitOfWork.TeamRepository.GetSingleAsync(x => x.CoachId == coachId);

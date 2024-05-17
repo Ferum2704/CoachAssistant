@@ -43,5 +43,10 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<IReadOnlyCollection<ActionTypeViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

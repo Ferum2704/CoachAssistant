@@ -36,5 +36,10 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<IReadOnlyCollection<MatchViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

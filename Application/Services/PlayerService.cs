@@ -88,5 +88,10 @@ namespace Application.Services
 
             return mapper.Map<PlayerViewModel>(player);
         }
+
+        public Task<IReadOnlyCollection<PlayerViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

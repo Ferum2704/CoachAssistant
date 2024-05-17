@@ -50,5 +50,10 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<IReadOnlyCollection<MatchTeamViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
