@@ -42,9 +42,11 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<MatchViewModel> Get(Guid id)
+        public async Task<MatchViewModel> Get(Guid id)
         {
-            throw new NotImplementedException();
+            var match = await unitOfWork.MatchRepository.GetByIdAsync(id);
+
+            return mapper.Map<MatchViewModel>(match);
         }
 
         public Task<IReadOnlyCollection<MatchViewModel>> GetAll()

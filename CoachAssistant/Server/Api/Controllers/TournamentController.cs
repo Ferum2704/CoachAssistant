@@ -1,9 +1,8 @@
 ﻿using Application.Abstractions;
-using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
-using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared;
+using CoachAssistant.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -52,6 +51,15 @@ namespace CoachAssistant.Server.Api.Controllers
             var tournament = await tournamentService.Get(tournamentId);
 
             return Ok(tournament);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var tournaments = await tournamentService.GetAll();
+
+            return Ok(tournaments);
         }
     }
 }

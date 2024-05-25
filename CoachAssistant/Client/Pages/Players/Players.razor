@@ -1,0 +1,78 @@
+﻿@page "/players"
+
+@inject IHttpClientService HttpClientService
+@inject IDialogService DialogService
+@inject ICurrentTeamProvider CurrentTeamProvider
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OpenAddPlayerDialog" Style="float: right;">Add Player</MudButton>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTable Items="@players">
+            <HeaderContent>
+                <MudTh>First Name</MudTh>
+                <MudTh>Last Name</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="First Name">@context.Name</MudTd>
+                <MudTd DataLabel="Last Name">@context.Surname</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd>
+                    <MudButton Icon="@Icons.Filled.Edit" OnClick="@(() => EditPlayer(context))">Edit</MudButton>
+                    <MudButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(() => DeletePlayer(context))">Delete</MudButton>
+                </MudTd>
+            </RowTemplate>
+         </MudTable>
+    </MudItem>
+</MudGrid>
+
+    @code {
+    private List<PlayerViewEntity> players = new List<PlayerViewEntity>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var currentClub = CurrentTeamProvider.CurrentClub;
+
+        if (currentClub is null)
+        {
+            var clubViewModel = await HttpClientService.GetAsync<ClubViewModel>(ApiUrls.CoachTeamUrl);
+
+            if (clubViewModel is not null)
+            {
+                CurrentTeamProvider.Set(clubViewModel);
+
+                currentClub = CurrentTeamProvider.CurrentClub;
+            }
+        }
+
+        players = currentClub.Team.Players;
+    }
+
+    private async Task OpenAddPlayerDialog()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var parameters = new DialogParameters();
+
+        var dialog = DialogService.Show<AddPlayerDialog>("Add Player", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            var newPlayer = result.Data as PlayerViewEntity;
+            players.Add(newPlayer);
+        }
+    }
+
+    private void EditPlayer(PlayerViewEntity player)
+    {
+        // Implement edit player logic
+    }
+
+    private void DeletePlayer(PlayerViewEntity player)
+    {
+        // Implement delete player logic
+    }
+}

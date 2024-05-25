@@ -1,14 +1,43 @@
-﻿<div class="nav flex-column">
-    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-        Home
-    </NavLink>
-    <NavLink class="nav-link" href="login">
-        Login
-    </NavLink>
-    <NavLink class="nav-link" href="register">
-        Register
-    </NavLink>
-    <NavLink class="nav-link" href="main">
-        Main
-    </NavLink>
-</div>
+﻿@using System.Security.Claims
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
+    @if (userRoles.Contains("Coach"))
+    {
+        <MudNavGroup Title="Team" Expanded="true">
+            <MudNavLink Href="/teamDetails" Match="NavLinkMatch.Prefix">Team details</MudNavLink>
+            <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Players</MudNavLink>
+            <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Trainings</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Tournaments" Expanded="true">
+            <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Tournament1 Coach</MudNavLink>
+            <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Tournament1</MudNavLink>
+        </MudNavGroup>
+    }
+    @if (userRoles.Contains("Manager"))
+    {
+        <MudNavGroup Title="Tournaments" Expanded="true">
+            <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Tournament1 Manager</MudNavLink>
+            <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Tournament1</MudNavLink>
+        </MudNavGroup>
+    }
+</MudNavMenu>
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+    private IEnumerable<string> userRoles = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userRoles = user.Claims
+                            .Where(c => c.Type.Equals(ClaimTypes.Role))
+                            .Select(c => c.Value)
+                            .ToList();
+        }
+    }
+}

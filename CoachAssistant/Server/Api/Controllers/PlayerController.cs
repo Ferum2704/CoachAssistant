@@ -33,7 +33,7 @@ namespace CoachAssistant.Server.Api.Controllers
 
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).PlayerAddedNotification(playerViewModel);
 
-            return Ok();
+            return Ok(playerViewModel);
         }
 
         [HttpGet("{playerId}")]

@@ -4,7 +4,7 @@
     <MudContainer>
         <EditForm Model="@user" OnValidSubmit="RegisterUser">
             <DataAnnotationsValidator />
-            <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="2">
                 <MudItem xs="12" sm="6" md="4">
                     <MudTextField @bind-Value="user.FirstName" Label="First name" Variant="Variant.Outlined" FullWidth />
                      <MudTextField @bind-Value="user.LastName" Label="Last name" Variant="Variant.Outlined" FullWidth />
@@ -14,7 +14,8 @@
                          <MudSelectItem Value="@("Coach")" />
                      </MudSelect>
                      <MudTextField @bind-Value="user.Password" Label="Password" Variant="Variant.Outlined" FullWidth InputType="InputType.Password" />
-                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth>Register</MudButton>
+                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth Class="mt-2">Register</MudButton>
+                     <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" FullWidth Class="mt-2" OnClick="@NavigateToLogin">Back to login</MudButton>
                  </MudItem>
              </MudGrid>
          </EditForm>
@@ -33,4 +34,6 @@
 
         NavigationManager.NavigateTo("/login");
     }
+
+    void NavigateToLogin() => NavigationManager.NavigateTo("/login");
 }

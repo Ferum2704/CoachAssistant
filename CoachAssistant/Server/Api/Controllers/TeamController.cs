@@ -41,6 +41,11 @@ namespace CoachAssistant.Server.Api.Controllers
         {
             var teamViewModel = await clubService.GetByCoachId(currentUserService.CurrentUserId);
 
+            if (teamViewModel is null)
+            {
+                return NotFound();
+            }
+
             return Ok(teamViewModel);
         }
 

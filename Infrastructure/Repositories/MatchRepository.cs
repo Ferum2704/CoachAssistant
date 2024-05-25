@@ -15,7 +15,6 @@ namespace Infrastructure.Repositories
             .Include(x => x.PlayerActions)
             .ThenInclude(x => x.ActionType)
             .Include(x => x.MatchTeams)
-            .ThenInclude(x => x.LineupPositions)
             .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 }

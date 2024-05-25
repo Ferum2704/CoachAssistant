@@ -13,7 +13,7 @@ namespace Infrastructure.Repositories
         public new async Task<MatchTeam?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             await dbSet
             .Include(x => x.LineupPositions)
-            .ThenInclude(x => x.Players)
+            .ThenInclude(x => x.MatchLineupPositionPlayers)
             .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 }

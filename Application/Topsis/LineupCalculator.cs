@@ -19,28 +19,34 @@ namespace Application.Topsis
         public async Task CalculateBestLineup(MatchTeam matchTeam)
         {
             var teamTrainings = await unitOfWork.TrainingRepository.GetAsync(x => x.TeamId == matchTeam.TeamId);
-            var lastThreeTrainings = matchTeam.Team.Trainings.OrderByDescending(x => x.StartDate).Take(3).ToList();
+            var lastThreeTrainings = teamTrainings.OrderByDescending(x => x.StartDate).Take(3).ToList();
 
             var bestPlayers = new List<Player>();
             foreach (var lineupPosition in matchTeam.LineupPositions)
             {
+                lineupPosition.Position = await unitOfWork.PositionRepository.GetByIdAsync(lineupPosition.PositionId);
+
                 var teamPlayers = await unitOfWork.PlayerRepository.GetAsync(x => x.TeamId == matchTeam.TeamId && !bestPlayers.Contains(x));
 
                 var rankedPlayers = await topsisCalculator.CalculateBestPlayers(teamPlayers, lineupPosition.Position, lastThreeTrainings);
-                bestPlayers.Add(rankedPlayers.First().Key);
 
-                foreach (var player in rankedPlayers.Take(5))
+                if (rankedPlayers != null)
                 {
-                    var positionPlayer = new MatchLineupPositionPlayer()
-                    {
-                        Id = Guid.NewGuid(),
-                        MatchLineupPositionId = lineupPosition.Id,
-                        PlayerId = player.Key.Id,
-                        Score = player.Value
-                    };
+                    bestPlayers.Add(rankedPlayers.First().Key);
 
-                    unitOfWork.MatchLineupPositionPlayerRepository.Add(positionPlayer);
-                    await unitOfWork.SaveAsync();
+                    foreach (var player in rankedPlayers.Take(5))
+                    {
+                        var positionPlayer = new MatchLineupPositionPlayer()
+                        {
+                            Id = Guid.NewGuid(),
+                            MatchLineupPositionId = lineupPosition.Id,
+                            PlayerId = player.Key.Id,
+                            Score = player.Value
+                        };
+
+                        unitOfWork.MatchLineupPositionPlayerRepository.Add(positionPlayer);
+                        await unitOfWork.SaveAsync();
+                    }
                 }
             }
         }

@@ -8,6 +8,6 @@
 
         public Guid MatchTeamId { get; set; }
 
-        public IReadOnlyCollection<PlayerViewModel> Players { get; set; }
+        public IReadOnlyCollection<MatchLineupPositionPlayerViewModel> MatchLineupPositionPlayers { get; set; }
     }
 }

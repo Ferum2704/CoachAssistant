@@ -66,9 +66,11 @@ namespace Application.Services
             return mapper.Map<TournamentViewModel>(tournament);
         }
 
-        public Task<IReadOnlyCollection<TournamentViewModel>> GetAll()
+        public async Task<IReadOnlyCollection<TournamentViewModel>> GetAll()
         {
-            throw new NotImplementedException();
+            var tournaments = await unitOfWork.TournamentRepository.GetAsync();
+
+            return mapper.Map<IReadOnlyCollection<TournamentViewModel>>(tournaments);
         }
     }
 }

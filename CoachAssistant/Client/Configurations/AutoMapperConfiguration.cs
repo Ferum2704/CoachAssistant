@@ -18,6 +18,9 @@ namespace CoachAssistant.Client.Configurations
         private static void Configure(IMapperConfigurationExpression cfg)
         {
             cfg.CreateMap<ClubViewModel, ClubViewEntity>();
+            cfg.CreateMap<TeamViewModel, TeamViewEntity>();
+            cfg.CreateMap<PlayerViewModel, PlayerViewEntity>();
+            cfg.CreateMap<TrainingViewModel, TrainingViewEntity>();
         }
     }
 }

@@ -108,6 +108,12 @@ namespace Application.Services
         public async Task<ClubViewModel> GetByCoachId(Guid coachId)
         {
             var team = await unitOfWork.TeamRepository.GetSingleAsync(x => x.CoachId == coachId);
+
+            if (team is null)
+            {
+                return null;   
+            }
+
             var club = await unitOfWork.ClubRepository.GetByIdAsync(team.ClubId);
 
             var clubViewModel = mapper.Map<ClubViewModel>(club);

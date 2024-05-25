@@ -1,0 +1,36 @@
+﻿@page "/add-team-club"
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@teamClubModel">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Name" @bind-Value="teamClubModel.Name" />
+                    <MudTextField Label="City" @bind-Value="teamClubModel.City" />
+                    <MudTextField Label="Region" @bind-Value="teamClubModel.Region" />
+                    <MudTextField Label="Stadium" @bind-Value="teamClubModel.Stadium" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Type="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="@HandleValidSubmit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@inject IHttpClientService HttpClientService
+@inject ILocalStorageService LocalStorage
+
+@code {
+    private HubConnection hubConnection;
+    private TeamClubModel teamClubModel = new();
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    async Task HandleValidSubmit()
+    {
+        await HttpClientService.PostAsync<TeamClubModel>(ApiUrls.PostTeamUrl, teamClubModel);
+
+        MudDialog.Close(DialogResult.Ok(teamClubModel));
+    }
+}

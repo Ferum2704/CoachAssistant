@@ -30,6 +30,12 @@ namespace Application.Topsis
             IReadOnlyCollection<Training> trainings)
         {
             var playerScores = InitializePlayerScores(players, position, trainings);
+
+            if (playerScores.Count == 0)
+            {
+                return null;
+            }
+
             await IncludePlayerActions(players, position, playerScores);
 
             var normalizedPlayerScores = estimationNormalizer.NormalizeScores(playerScores);
@@ -62,7 +68,11 @@ namespace Application.Topsis
                         playerMarks[criterion] = marks.Average();
                     }
                 }
-                scores[player] = playerMarks;
+
+                if (playerMarks.Count == position.Criteria.Count && playerMarks.Values.All(x => x > 0))
+                {
+                    scores[player] = playerMarks;
+                }
             }
             return scores;
         }

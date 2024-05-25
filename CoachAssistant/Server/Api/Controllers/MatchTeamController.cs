@@ -1,7 +1,9 @@
 ﻿using Application.Abstractions;
+using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
+using CoachAssistant.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -31,6 +33,23 @@ namespace CoachAssistant.Server.Api.Controllers
         public async Task<IActionResult> CalculateTeamLineup(Guid matchTeamId)
         {
             var matchTeam = await matchTeamService.CalculateLineUp(matchTeamId);
+
+            return Ok(matchTeam);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [HttpPut("{matchTeamId}")]
+        public async Task<IActionResult> Put(Guid matchTeamId, MatchTeamModel model)
+        {
+            await matchTeamService.Edit(matchTeamId, model);
+
+            return Ok();
+        }
+
+        [HttpGet("{matchTeamId}")]
+        public async Task<IActionResult> GetById(Guid matchTeamId)
+        {
+            var matchTeam = await matchTeamService.Get(matchTeamId);
 
             return Ok(matchTeam);
         }

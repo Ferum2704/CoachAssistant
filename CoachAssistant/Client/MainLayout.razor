@@ -3,14 +3,36 @@
 
 <MudLayout>
     <MudAppBar>
-        <ChildContent>
-            @if (isAuthenticated)
-            {
-                <MudText Typo="Typo.h6" Class="mr-2">Hello, @userName!</MudText>
-                <MudButton OnClick="@Logout">Logout</MudButton>
-            }
-        </ChildContent>
+        <MudGrid>
+            <MudItem xs="9" >
+                <MudPaper Elevation="0" Class="d-flex align-center" Style="background-color: transparent;">
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu" Style="color: white" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                    <MudText Typo="Typo.h6" Class="mr-2" Style="color: white">Team assistant</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="3">
+                @if (isAuthenticated)
+                {
+                    <MudPaper Elevation="0" Class="d-flex align-center justify-end mt-1" Style="background-color: transparent;">
+                        <MudText Typo="Typo.h6" Class="mr-2" Style="color: white">Hello, @userName!</MudText>
+                        <MudButton Variant="Variant.Text" OnClick="@Logout" Color="Color.Secondary">Logout</MudButton>
+                    </MudPaper>
+                }
+@*                 else
+                {
+                    <MudPaper Elevation="0" Class="d-flex align-center justify-end mt-1" Style="background-color: transparent;">
+                        <MudButton Variant="Variant.Text" OnClick="@Login" Color="Color.Secondary">Login</MudButton>
+                    </MudPaper>
+                } *@
+            </MudItem>
+        </MudGrid>
     </MudAppBar>
+    @if (isAuthenticated)
+    {
+        <MudDrawer @bind-Open="@_drawerOpen">
+            <NavMenu />
+        </MudDrawer>
+    }
     <MudMainContent>
         @Body
     </MudMainContent>
@@ -18,10 +40,20 @@
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAccountManager accountManager;
+@inject ILocalStorageService LocalStorage
+@inject IHttpClientService HttpClientService
 
 @code {
     private bool isAuthenticated = false;
     private string userName = "";
+
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,9 +62,12 @@
         userName = authState.User.Identity.IsAuthenticated ? authState.User.Identity.Name : "Guest";
     }
 
-    private void Logout()
+    private async Task Logout()
     {
-        // Implement your logout logic
-        NavigationManager.NavigateTo("login");
+        await LocalStorage.RemoveItemAsync("AccessToken");
+        await HttpClientService.PostAsync(ApiUrls.RevokeUrl, "revoke");
+
+        accountManager.MarkUserAsLoggedOut();
+        NavigationManager.NavigateTo("/login", forceLoad: true);
     }
 }

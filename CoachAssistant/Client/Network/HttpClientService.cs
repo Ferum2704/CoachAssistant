@@ -22,7 +22,8 @@ namespace CoachAssistant.Client.Network
             }
             else
             {
-                throw new Exception($"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                // throw new Exception($"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                return default;
             }
         }
 
@@ -42,7 +43,9 @@ namespace CoachAssistant.Client.Network
             }
             else
             {
-                throw new Exception($"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                // throw new Exception($"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+
+                return default;
             }
         }
     }

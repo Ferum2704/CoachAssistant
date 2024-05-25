@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace CoachAssistant.Client
 {
-    public class CustomAuthStateProvider : AuthenticationStateProvider
+    public class CustomAuthStateProvider : AuthenticationStateProvider, IAccountManager
     {
         private readonly ILocalStorageService _localStorage;
         private readonly HttpClient _http;
@@ -37,6 +37,13 @@ namespace CoachAssistant.Client
             NotifyAuthenticationStateChanged(Task.FromResult(state));
 
             return state;
+        }
+
+        public void MarkUserAsLoggedOut()
+        {
+            var identity = new ClaimsIdentity();
+            var user = new ClaimsPrincipal(identity);
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
 
         private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)

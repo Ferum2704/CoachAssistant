@@ -9,7 +9,7 @@ public class TournamentMatchesGenerator : ITournamentMatchesGenerator
     private readonly IUnitOfWork unitOfWork;
 
     private IReadOnlyList<Team> teams;
-    private List<Match> matches;
+    private List<Match> matches = new();
     private int daysCount = 0;
 
     public TournamentMatchesGenerator(IUnitOfWork unitOfWork)
