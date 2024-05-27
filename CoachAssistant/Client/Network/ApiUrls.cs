@@ -26,6 +26,8 @@
 
         public static string MatchTeamsUrl => $"{BaseUrl}/matchTeams";
 
+        public static string PositionCriteriaUrl => $"{BaseUrl}/positionCriteria";
+
         public static string GetPostPlayerUrl(Guid teamId) => string.Format(PlayersUrl, teamId);
 
         public static string GetTournamentByIdUrl(string tournamentId) => $"{TournamentsUrl}/{tournamentId}";
@@ -37,5 +39,7 @@
         public static string GetMatchByIdUrl(string matchId) => $"{MatchesUrl}/{matchId}";
 
         public static string GetMatchTeamByIdUrl(Guid matchTeamId) => $"{MatchTeamsUrl}/{matchTeamId}";
+
+        public static string GetPositionCriteriaByIdUrl(Guid positionCriterionId) => $"{PositionCriteriaUrl}/{positionCriterionId}";
     }
 }

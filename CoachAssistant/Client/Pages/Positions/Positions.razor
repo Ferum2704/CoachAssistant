@@ -1,0 +1,107 @@
+﻿@page "/positions"
+@inject CriterionService CriterionService
+@inject PositionService PositionService
+@inject PositionCriteriaService PositionCriteriaService
+@inject IDialogService DialogService
+
+<MudGrid>
+    @foreach (var position in positions)
+    {
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6">@position.Name</MudText>
+                        @foreach (var positionCriterion in position.Criteria)
+                    {
+                        <MudGrid Style="align-items: center; width: 100%; margin-bottom: 8px;">
+                            <MudItem xs="5">
+                                <MudText Typo="Typo.body1" Style="font-weight:normal">@positionCriterion.Criterion.Name</MudText>
+                            </MudItem>
+                            <MudItem xs="4">
+                                <MudSlider Min="1" Max="10" Step="1" Color="Color.Primary" Value="@positionCriterion.Weight" ValueChanged="@((float value) => UpdateWeight(position.Id, positionCriterion.Id, value))" />
+                            </MudItem>
+                            <MudItem xs="2">
+                                <MudText>@positionCriterion.Weight</MudText>
+                            </MudItem>
+                            <MudItem xs="1" Style="display: flex; justify-content: center; align-items: center;">
+                                <MudIconButton Icon="@Icons.Filled.Close" Color="Color.Secondary" Size="Size.Small" OnClick="@(() => DeleteCriterion(position.Id, positionCriterion.Id))" />
+                            </MudItem>
+                        </MudGrid>
+                    }
+                    <MudButton OnClick="() => AddCriterion(position.Id)" Color="Color.Primary">Add Criterion</MudButton>
+                    <MudButton OnClick="() => SaveChanges(position.Id)" Color="Color.Secondary" Disabled="!IsDirty(position.Id)">Save Changes</MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    List<PositionViewModel> positions = new List<PositionViewModel>();
+    Dictionary<Guid, Dictionary<Guid, PositionCriteriaModel>> updatedPositionCriteria = new();
+
+    protected override void OnInitialized()
+    {
+        positions = PositionService.Positions;
+
+        foreach (var positionCriteria in positions.SelectMany(x => x.Criteria))
+        {
+            positionCriteria.Criterion = CriterionService.Criteria.First(x => x.Id == positionCriteria.CriterionId);
+        }
+    }
+
+    void UpdateWeight(Guid positionId, Guid positionCriterionId, float newWeight)
+    {
+        var position = positions.FirstOrDefault(p => p.Id == positionId);
+        var criterion = position?.Criteria.FirstOrDefault(c => c.Id == positionCriterionId);
+        if (criterion != null)
+        {
+            criterion.Weight = newWeight;
+
+            if (!updatedPositionCriteria.ContainsKey(positionId))
+            {
+                updatedPositionCriteria[positionId] = new Dictionary<Guid, PositionCriteriaModel>();
+            }
+
+            updatedPositionCriteria[positionId][positionCriterionId] = new PositionCriteriaModel()
+            {
+                Weight = newWeight
+            };
+
+            StateHasChanged();
+        }
+    }
+
+    void AddCriterion(Guid positionId)
+    {
+        var parameters = new DialogParameters { ["PositionId"] = positionId };
+        DialogService.Show<AddCriterionDialog>("Add Criteria", parameters, new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small });
+    }
+
+    async Task SaveChanges(Guid positionId)
+    {
+        await PositionCriteriaService.EditRange(updatedPositionCriteria[positionId]);
+        await PositionService.GetAll();
+        var isSuccess = updatedPositionCriteria.Remove(positionId);
+
+        StateHasChanged();
+    }
+
+    bool IsDirty(Guid positionId)
+    {
+        return updatedPositionCriteria.ContainsKey(positionId);
+    }
+
+    async Task DeleteCriterion(Guid positionId, Guid positionCriterionId)
+    {
+        var position = positions.FirstOrDefault(p => p.Id == positionId);
+        var criterion = position?.Criteria.FirstOrDefault(c => c.Id == positionCriterionId);
+        if (criterion != null)
+        {
+            await PositionCriteriaService.Remove(positionCriterionId);
+            position.Criteria.Remove(criterion);
+            StateHasChanged();  // Update UI after removing the criterion
+        }
+    }
+
+}

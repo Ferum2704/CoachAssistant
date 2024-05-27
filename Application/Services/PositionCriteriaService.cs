@@ -28,9 +28,15 @@ namespace Application.Services
             return mapper.Map<PositionCriteriaViewModel>(positionCriteria);
         }
 
-        public Task Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            var positionCriterion = await unitOfWork.PositionCriteriaRepository.GetByIdAsync(id);
+
+            if (positionCriterion is not null)
+            {
+                unitOfWork.PositionCriteriaRepository.Remove(positionCriterion);
+                await unitOfWork.SaveAsync();
+            }
         }
 
         public Task DeleteBulk<TEntity>(Func<TEntity, bool> predicate)
@@ -43,9 +49,23 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, PositionCriteriaModel model)
+        public async Task<PositionCriteriaViewModel> Edit(Guid id, PositionCriteriaModel model)
         {
-            throw new NotImplementedException();
+            var positionCriterion = await unitOfWork.PositionCriteriaRepository.GetByIdAsync(id);
+
+            if (positionCriterion is not null)
+            {
+                if (positionCriterion.Weight != model.Weight)
+                {
+                    positionCriterion.Weight = model.Weight;
+                }
+
+                unitOfWork.PositionCriteriaRepository.Update(positionCriterion);
+
+                await unitOfWork.SaveAsync();
+            }
+
+            return mapper.Map<PositionCriteriaViewModel>(positionCriterion);
         }
 
         public Task<PositionCriteriaViewModel> Get(Guid id)

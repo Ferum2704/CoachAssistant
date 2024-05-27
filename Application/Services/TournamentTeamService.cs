@@ -43,7 +43,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, TournamentTeamModel model)
+        public Task<TournamentTeamViewModel> Edit(Guid id, TournamentTeamModel model)
         {
             throw new NotImplementedException();
         }

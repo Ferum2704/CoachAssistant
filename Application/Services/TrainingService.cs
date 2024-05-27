@@ -53,7 +53,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, TrainingModel model)
+        public Task<TrainingViewModel> Edit(Guid id, TrainingModel model)
         {
             throw new NotImplementedException();
         }

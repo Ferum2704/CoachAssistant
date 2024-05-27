@@ -4,7 +4,7 @@
     {
         Task<TResult> Add(T model);
 
-        Task Edit(Guid id, T model);
+        Task<TResult> Edit(Guid id, T model);
 
         Task<TResult> Get(Guid id);
 

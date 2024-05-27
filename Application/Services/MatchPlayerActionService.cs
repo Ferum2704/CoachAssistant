@@ -43,7 +43,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, MatchPlayerActionModel model)
+        public Task<MatchPlayerActionViewModel> Edit(Guid id, MatchPlayerActionModel model)
         {
             throw new NotImplementedException();
         }

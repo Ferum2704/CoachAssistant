@@ -52,7 +52,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task Edit(Guid id, MatchTeamModel model)
+        public async Task<MatchTeamViewModel> Edit(Guid id, MatchTeamModel model)
         {     
             var matchTeam = await unitOfWork.MatchTeamRepository.GetByIdAsync(id);
 
@@ -91,6 +91,8 @@ namespace Application.Services
             }
 
             await unitOfWork.SaveAsync();
+
+            return mapper.Map<MatchTeamViewModel>(matchTeam);
         }
 
         public async Task<MatchTeamViewModel> Get(Guid id)

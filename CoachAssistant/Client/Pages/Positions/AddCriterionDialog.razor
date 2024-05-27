@@ -1,0 +1,71 @@
+﻿@inject CriterionService CriterionService
+@inject PositionService PositionService
+@inject PositionCriteriaService PositionCriteriaService
+
+
+<MudDialog>
+    <DialogContent>
+        <MudCard>
+            <MudCardContent>
+                <MudList>
+                    @foreach (var criterion in availableCriteria)
+                    {
+                        <MudListItem>
+                            <MudCheckBox T="bool" Value="@selectedCriteria.Contains(criterion)" ValueChanged="@((bool isChecked) => HandleCheckBoxChange(criterion, isChecked))" />
+                            <MudText Class="ml-2">@criterion.Name</MudText>
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton OnClick="Submit" Color="Color.Primary">Add</MudButton>
+                <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter] 
+    public Guid PositionId { get; set; }
+    List<CriterionViewModel> availableCriteria = new List<CriterionViewModel>();
+    HashSet<CriterionViewModel> selectedCriteria = new HashSet<CriterionViewModel>();
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var allCriteria = CriterionService.Criteria;
+        var currentCriteria = PositionService.Positions.First(x => x.Id == PositionId).Criteria;
+        var currentCriterionIds = new HashSet<Guid>(currentCriteria.Select(c => c.CriterionId));
+        availableCriteria = allCriteria.Where(c => !currentCriterionIds.Contains(c.Id)).ToList();
+    }
+
+    void HandleCheckBoxChange(CriterionViewModel criterion, bool isChecked)
+    {
+        if (isChecked && !selectedCriteria.Contains(criterion))
+            selectedCriteria.Add(criterion);
+        else if (!isChecked && selectedCriteria.Contains(criterion))
+            selectedCriteria.Remove(criterion);
+    }
+
+    async Task Submit()
+    {
+        foreach (var criterion in selectedCriteria)
+        {
+            await PositionCriteriaService.Post(new PositionCriteriaModel
+            {
+                PositionId = PositionId,
+                CriterionId = criterion.Id,
+                Weight = 1
+            });
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel()
+    {
+        MudDialog.Close(DialogResult.Cancel());
+    }
+}

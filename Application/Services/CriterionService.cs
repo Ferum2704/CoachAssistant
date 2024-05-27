@@ -43,7 +43,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, CriterionModel model)
+        public Task<CriterionViewModel> Edit(Guid id, CriterionModel model)
         {
             throw new NotImplementedException();
         }

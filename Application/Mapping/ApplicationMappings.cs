@@ -50,7 +50,8 @@ namespace Application.Mapping
                 .ForMember(x => x.Player, act => act.Ignore());
 
             cfg.CreateMap<PositionModel, Position>();
-            cfg.CreateMap<Position, PositionViewModel>();
+            cfg.CreateMap<Position, PositionViewModel>()
+                .ForMember(x => x.Criteria, act => act.MapFrom(x => x.PositionCriteria));
             cfg.CreateMap<CriterionModel, Criterion>();
             cfg.CreateMap<Criterion, CriterionViewModel>();
             cfg.CreateMap<PositionCriteriaModel, PositionCriteria>();

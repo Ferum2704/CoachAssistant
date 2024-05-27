@@ -12,6 +12,8 @@
 
         Task PutAsync<T>(string url, T data);
 
+        Task<TResult> PutAsync<T, TResult>(string url, T data);
+
         Task DeleteAsync(string url);
     }
 }

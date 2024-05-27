@@ -44,7 +44,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, ActionTypeModel model)
+        public Task<ActionTypeViewModel> Edit(Guid id, ActionTypeModel model)
         {
             throw new NotImplementedException();
         }

@@ -37,7 +37,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, MatchModel model)
+        public Task<MatchViewModel> Edit(Guid id, MatchModel model)
         {
             throw new NotImplementedException();
         }

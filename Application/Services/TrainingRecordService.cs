@@ -38,7 +38,7 @@ namespace Application.Services
             await unitOfWork.SaveAsync();
         }
 
-        public async Task Edit(Guid id, TrainingRecordModel model)
+        public async Task<TrainingRecordViewModel> Edit(Guid id, TrainingRecordModel model)
         {
             var trainingRecord = await unitOfWork.TrainingRecordRepository.GetByIdAsync(id);
 
@@ -56,6 +56,8 @@ namespace Application.Services
                 unitOfWork.TrainingRecordRepository.Update(trainingRecord);
                 await unitOfWork.SaveAsync();
             }
+
+            return mapper.Map<TrainingRecordViewModel>(trainingRecord);
         }
 
         public async Task<TrainingRecordViewModel> Get(Guid id)

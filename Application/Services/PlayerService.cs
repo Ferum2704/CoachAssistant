@@ -72,7 +72,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task Edit(Guid id, PlayerModel model)
+        public async Task<PlayerViewModel> Edit(Guid id, PlayerModel model)
         {
             var player = await unitOfWork.PlayerRepository.GetByIdAsync(id);
 
@@ -103,6 +103,8 @@ namespace Application.Services
 
             unitOfWork.PlayerRepository.Update(player);
             await unitOfWork.SaveAsync();
+
+            return mapper.Map<PlayerViewModel>(player);
         }
 
         public async Task<PlayerViewModel> Get(Guid id)

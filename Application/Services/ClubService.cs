@@ -82,7 +82,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task Edit(Guid id, TeamClubModel model)
+        public Task<ClubViewModel> Edit(Guid id, TeamClubModel model)
         {
             throw new NotImplementedException();
         }
