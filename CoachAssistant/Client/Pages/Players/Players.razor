@@ -30,7 +30,7 @@
 </MudGrid>
 
     @code {
-    private List<PlayerViewEntity> players = new List<PlayerViewEntity>();
+    private List<PlayerViewModel> players = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,13 +42,13 @@
 
             if (clubViewModel is not null)
             {
-                CurrentTeamProvider.Set(clubViewModel);
+                CurrentTeamProvider.CurrentClub = clubViewModel;
 
                 currentClub = CurrentTeamProvider.CurrentClub;
             }
         }
 
-        players = currentClub.Team.Players;
+        players = currentClub.Team.Players.ToList();
     }
 
     private async Task OpenAddPlayerDialog()
@@ -61,17 +61,17 @@
 
         if (!result.Cancelled)
         {
-            var newPlayer = result.Data as PlayerViewEntity;
+            var newPlayer = result.Data as PlayerViewModel;
             players.Add(newPlayer);
         }
     }
 
-    private void EditPlayer(PlayerViewEntity player)
+    private void EditPlayer(PlayerViewModel player)
     {
         // Implement edit player logic
     }
 
-    private void DeletePlayer(PlayerViewEntity player)
+    private void DeletePlayer(PlayerViewModel player)
     {
         // Implement delete player logic
     }

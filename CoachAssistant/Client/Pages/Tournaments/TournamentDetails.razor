@@ -1,0 +1,39 @@
+﻿@page "/tournament/{TournamentId}"
+
+@inject TournamentService TournamentService
+
+<MudTabs>
+    <MudTabPanel Text="Teams">
+        <TeamsListTab Tournament="@Tournament" />
+    </MudTabPanel>
+    <MudTabPanel Text="Schedule">
+        <ScheduleTab Tournament="@Tournament" />
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    [Parameter]
+    public string TournamentId { get; set; }
+    private string previousTournamentId;
+
+    public TournamentViewModel Tournament { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTournament();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (previousTournamentId != TournamentId)
+        {
+            await LoadTournament();
+        }
+    }
+
+    private async Task LoadTournament()
+    {
+        Tournament = await TournamentService.GetTournamentById(TournamentId);
+        previousTournamentId = TournamentId;
+    }
+}

@@ -2,12 +2,14 @@
 using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
+using CoachAssistant.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoachAssistant.Server.Api.Controllers
 {
-    [Route("api/coaching-system")]
+    [Route("api/coaching-system/matchs")]
     [ApiController]
     public class MatchController : ControllerBase
     {
@@ -22,6 +24,7 @@ namespace CoachAssistant.Server.Api.Controllers
             this.hubContext = hubContext;
         }
 
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpGet("{matchId}")]
         public async Task<IActionResult> GetById(Guid matchId)
         {

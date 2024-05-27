@@ -72,5 +72,12 @@ namespace Application.Services
 
             return mapper.Map<IReadOnlyCollection<TournamentViewModel>>(tournaments);
         }
+
+        public async Task<IReadOnlyCollection<TournamentViewModel>> GetByTeamId(Guid teamId)
+        {
+            var tournaments = await unitOfWork.TournamentRepository.GetAsync(x => x.TournamentTeams.Select(x => x.TeamId).Contains(teamId));
+
+            return mapper.Map<IReadOnlyCollection<TournamentViewModel>>(tournaments);
+        }
     }
 }

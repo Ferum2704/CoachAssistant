@@ -63,5 +63,12 @@ namespace CoachAssistant.Client
             }
             return Convert.FromBase64String(base64);
         }
+
+        public async Task<bool> IsUserInRole(string role)
+        {
+            var authState = await GetAuthenticationStateAsync();
+
+            return authState.User.IsInRole(role);
+        }
     }
 }

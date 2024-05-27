@@ -34,7 +34,7 @@ else
 @inject IDialogService DialogService
 
 @code {
-    ClubViewEntity club;
+    ClubViewModel club;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,7 +42,7 @@ else
 
         if (clubViewModel is not null)
         {
-            CurrentTeamProvider.Set(clubViewModel);
+            CurrentTeamProvider.CurrentClub = clubViewModel;
 
             club = CurrentTeamProvider.CurrentClub;
         }

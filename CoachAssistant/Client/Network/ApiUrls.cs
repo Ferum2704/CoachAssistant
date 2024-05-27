@@ -10,12 +10,32 @@
 
         public static string RevokeUrl => $"{BaseUrl}/identity/revoke";
 
-        public static string PostTeamUrl => $"{BaseUrl}/teams";
+        public static string TeamsUrl => $"{BaseUrl}/teams";
 
-        public static string PlayerUrl => $"{BaseUrl}/teams/{{0}}/players";
+        public static string PlayersUrl => $"{BaseUrl}/teams/{{0}}/players";
 
         public static string CoachTeamUrl => $"{BaseUrl}/teams/coach";
 
-        public static string GetPostPlayerUrl(Guid teamId) => string.Format(PlayerUrl, teamId);
+        public static string TournamentsUrl => $"{BaseUrl}/tournaments";
+
+        public static string MatchesUrl => $"{BaseUrl}/matchs";
+
+        public static string CriteriaUrl => $"{BaseUrl}/criteria";
+
+        public static string PositionsUrl => $"{BaseUrl}/positions";
+
+        public static string MatchTeamsUrl => $"{BaseUrl}/matchTeams";
+
+        public static string GetPostPlayerUrl(Guid teamId) => string.Format(PlayersUrl, teamId);
+
+        public static string GetTournamentByIdUrl(string tournamentId) => $"{TournamentsUrl}/{tournamentId}";
+
+        public static string GetMatchesByTournamentIdUrl(string tournamentId) => $"{TournamentsUrl}/{tournamentId}/matches";
+
+        public static string GetTeamTournamentsUrl(Guid teamdId) => $"{TournamentsUrl}?teamId={teamdId}";
+
+        public static string GetMatchByIdUrl(string matchId) => $"{MatchesUrl}/{matchId}";
+
+        public static string GetMatchTeamByIdUrl(Guid matchTeamId) => $"{MatchTeamsUrl}/{matchTeamId}";
     }
 }

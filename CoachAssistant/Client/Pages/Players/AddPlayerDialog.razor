@@ -34,6 +34,6 @@
     {
         var player = await HttpClientService.PostAsync<PlayerModel, PlayerViewModel>(ApiUrls.GetPostPlayerUrl(CurrentTeamProvider.CurrentClub.Team.Id), playerModel);
 
-        MudDialog.Close(DialogResult.Ok(Mapper.Map<PlayerViewEntity>(player)));
+        MudDialog.Close(DialogResult.Ok(player));
     }
 }

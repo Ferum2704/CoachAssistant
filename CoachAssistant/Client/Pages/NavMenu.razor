@@ -1,43 +1,77 @@
 ﻿@using System.Security.Claims
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
-    @if (userRoles.Contains("Coach"))
+    @if (isCoach)
     {
         <MudNavGroup Title="Team" Expanded="true">
             <MudNavLink Href="/teamDetails" Match="NavLinkMatch.Prefix">Team details</MudNavLink>
             <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Players</MudNavLink>
             <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Trainings</MudNavLink>
         </MudNavGroup>
-        <MudNavGroup Title="Tournaments" Expanded="true">
-            <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Tournament1 Coach</MudNavLink>
-            <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Tournament1</MudNavLink>
-        </MudNavGroup>
     }
-    @if (userRoles.Contains("Manager"))
+    @if (isManager || isCoach)
     {
         <MudNavGroup Title="Tournaments" Expanded="true">
-            <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Tournament1 Manager</MudNavLink>
-            <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Tournament1</MudNavLink>
+            @foreach (var tournament in TournamentService.Tournaments)
+            {
+                <MudNavLink Href="@($"/tournament/{tournament.Id}")">
+                    @tournament.Name
+                </MudNavLink>
+            }
         </MudNavGroup>
     }
 </MudNavMenu>
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAccountManager AccountManager
+@inject IHttpClientService HttpClientService
+@inject ICurrentTeamProvider CurrentTeamProvider
+@inject TournamentService TournamentService
+@inject TeamService TeamService
+@inject CriterionService CriterionService
+@inject PositionService PositionService
 
 @code {
-    private IEnumerable<string> userRoles = new List<string>();
+    private bool isManager;
+    private bool isCoach;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
+        isManager = await AccountManager.IsUserInRole("Manager");
+        isCoach = await AccountManager.IsUserInRole("Coach");
+
         if (user.Identity.IsAuthenticated)
         {
-            userRoles = user.Claims
-                            .Where(c => c.Type.Equals(ClaimTypes.Role))
-                            .Select(c => c.Value)
-                            .ToList();
+            TournamentService.OnChange += StateHasChanged;
+
+            if (isManager)
+            {
+                await TeamService.LoadTeams();
+                await TournamentService.LoadTournaments();
+            }
+            else if (isCoach)
+            {
+
+                await PositionService.GetAll();
+                await CriterionService.GetAll();
+
+                var clubViewModel = await HttpClientService.GetAsync<ClubViewModel>(ApiUrls.CoachTeamUrl);
+
+                if (clubViewModel is not null)
+                {
+                    CurrentTeamProvider.CurrentClub = clubViewModel;
+                }
+
+                await TournamentService.LoadTeamTournaments(CurrentTeamProvider.CurrentClub.Team.Id);
+            }
         }
+    }
+
+    public void Dispose()
+    {
+        TournamentService.OnChange -= StateHasChanged;
     }
 }

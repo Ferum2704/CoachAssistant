@@ -28,6 +28,12 @@ builder.Services.AddTransient<INotificationHandler<ClubViewModel>, TeamAddedNoti
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<ICurrentTeamProvider, CurrentTeamProvider>();
+builder.Services.AddScoped<TournamentService>();
+builder.Services.AddScoped<TeamService>();
+builder.Services.AddScoped<MatchService>();
+builder.Services.AddScoped<PositionService>();
+builder.Services.AddScoped<CriterionService>();
+builder.Services.AddScoped<MatchTeamService>();
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

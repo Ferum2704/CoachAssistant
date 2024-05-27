@@ -1,5 +1,6 @@
 ﻿
 using System.Net.Http.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CoachAssistant.Client.Network
 {
@@ -47,6 +48,18 @@ namespace CoachAssistant.Client.Network
 
                 return default;
             }
+        }
+
+        public async Task<TResult> PostAsync<TResult>(string url)
+        {
+            var response = await _httpClient.PostAsync(url, null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<TResult>();
+            }
+
+            return default;
         }
     }
 }

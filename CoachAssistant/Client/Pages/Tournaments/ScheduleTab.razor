@@ -1,0 +1,82 @@
+﻿@inject TournamentService TournamentService
+@inject TeamService TeamService
+@inject NavigationManager NavigationManager
+
+@if (matches == null || matches.Count == 0)
+{
+    <MudButton OnClick="@GenerateSchedule">Generate Schedule</MudButton>
+}
+else
+{
+    <MudTable Items="@matches">
+        <HeaderContent>
+            <MudTh>Match</MudTh>
+            <MudTh>Location</MudTh>
+            <MudTh>Start Time</MudTh>
+            <MudTh>Details</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@string.Join(" vs ", context.MatchTeams.Select(mt => mt.Team.Name))</MudTd>
+            <MudTd>@context.Location</MudTd>
+            <MudTd>@context.StartTime.ToString("g")</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Filled.ArrowForward" OnClick="(() => NavigateToMatchDetails(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private TournamentViewModel tournament;
+    private IReadOnlyCollection<MatchViewModel> matches = new List<MatchViewModel>();
+    private List<TeamViewModel> teams = new();
+
+    [Parameter]
+    public TournamentViewModel Tournament
+    {
+        get => tournament;
+        set
+        {
+            tournament = value;
+            LoadTeams();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (tournament is not null)
+        {
+            matches = tournament.Matches;
+        }
+    }
+
+    private async Task GenerateSchedule()
+    {
+        var tournament = await TournamentService.GenerateSchedule(Tournament.Id.ToString());
+
+        foreach (var matchTeam in matches.SelectMany(x => x.MatchTeams))
+        {
+            matchTeam.Team = teams.FirstOrDefault(x => x.Id == matchTeam.TeamId);
+        }
+
+        matches = tournament.Matches;
+
+        StateHasChanged();
+    }
+
+    private void LoadTeams()
+    {
+        if (Tournament != null)
+        {
+            var teamsIds = Tournament.TournamentTeams.Select(x => x.TeamId).Distinct().ToList();
+
+            teams = TeamService.GetTournamentsTeams(teamsIds);
+        }
+    }
+
+    private void NavigateToMatchDetails(Guid matchId)
+    {
+        NavigationManager.NavigateTo($"/match/{matchId}");
+    }
+
+}

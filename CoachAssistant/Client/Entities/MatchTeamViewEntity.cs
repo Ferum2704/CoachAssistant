@@ -1,14 +1,14 @@
-﻿namespace CoachAssistant.Shared.ViewModels
+﻿using CoachAssistant.Shared;
+
+namespace CoachAssistant.Client.Entities
 {
-    public class MatchTeamViewModel
+    public class MatchTeamViewEntity
     {
         public Guid Id { get; set; }
 
         public Guid MatchId { get; set; }
 
         public Guid TeamId { get; set; }
-
-        public TeamViewModel Team { get; set; }
 
         public MatchTeamType TeamType { get; set; }
 
@@ -18,6 +18,6 @@
 
         public int NumberOfForwards { get; set; }
 
-        public IReadOnlyCollection<MatchLineupPositionViewModel> LineupPositions { get; set; }
+        public IReadOnlyCollection<MatchLineupPositionViewEntity> LineupPositions { get; set; }
     }
 }

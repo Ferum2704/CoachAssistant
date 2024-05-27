@@ -1,0 +1,50 @@
+﻿@inject TeamService TeamService
+@inject NavigationManager NavigationManager
+
+<MudText Typo="Typo.h6">Teams in this Tournament</MudText>
+<MudButton OnClick="@AddTeam">Add Team</MudButton>
+<MudTable Items="@teams">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Verification State</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+            <MudTd>@context.VerificationState</MudTd>
+        </RowTemplate>
+</MudTable>
+
+    @code {
+    private TournamentViewModel tournament;
+    private List<TeamViewModel> teams = new();
+
+    [Parameter]
+    public TournamentViewModel Tournament
+    {
+        get => tournament;
+        set
+        {
+            tournament = value;
+            LoadTeams();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    void LoadTeams()
+    {
+        if (Tournament != null)
+        {
+            var teamsIds = Tournament.TournamentTeams.Select(x => x.TeamId).Distinct().ToList();
+
+            teams = TeamService.GetTournamentsTeams(teamsIds);
+        }
+    }
+
+    private void AddTeam()
+    {
+        //NavigationManager.NavigateTo($"/addteam/{TournamentId}");
+    }
+}

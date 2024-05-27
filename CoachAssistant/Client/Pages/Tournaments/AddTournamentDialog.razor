@@ -1,0 +1,41 @@
+﻿@page "/add-tournament-dialog"
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@tournamentModel">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Name" @bind-Value="tournamentModel.Name" />
+                    <MudSelect T="string" @bind-Value="tournamentModel.TournamentType" Variant="Variant.Text">
+                        <MudSelectItem Value="@("Friendly")" />
+                        <MudSelectItem Value="@("Cup")" />
+                        <MudSelectItem Value="@("LocalLeague")" />
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Type="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="@HandleValidSubmit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@inject IHttpClientService HttpClientService
+@inject ILocalStorageService LocalStorage
+@inject TournamentService TournamentService
+
+@code {
+    private HubConnection hubConnection;
+    private TournamentModel tournamentModel = new();
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    async Task HandleValidSubmit()
+    {
+        var tournament = await HttpClientService.PostAsync<TournamentModel, TournamentViewModel>(ApiUrls.TournamentsUrl, tournamentModel);
+
+        TournamentService.AddTournament(tournament);
+
+        MudDialog.Close(DialogResult.Ok(tournamentModel));
+    }
+}

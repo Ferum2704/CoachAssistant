@@ -19,7 +19,7 @@ namespace CoachAssistant.Client.Network.NotificationHandlers
 
         public void Handle(ClubViewModel notification)
         {
-            currentTeamProvider.Set(notification);
+            currentTeamProvider.CurrentClub = notification;
         }
     }
 }

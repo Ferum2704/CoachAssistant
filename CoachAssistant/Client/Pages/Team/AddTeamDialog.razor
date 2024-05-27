@@ -29,7 +29,7 @@
 
     async Task HandleValidSubmit()
     {
-        await HttpClientService.PostAsync<TeamClubModel>(ApiUrls.PostTeamUrl, teamClubModel);
+        await HttpClientService.PostAsync<TeamClubModel>(ApiUrls.TeamsUrl, teamClubModel);
 
         MudDialog.Close(DialogResult.Ok(teamClubModel));
     }

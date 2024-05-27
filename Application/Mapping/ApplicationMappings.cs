@@ -44,8 +44,10 @@ namespace Application.Mapping
             cfg.CreateMap<Match, MatchViewModel>();
 
             cfg.CreateMap<MatchTeam, MatchTeamViewModel>();
-            cfg.CreateMap<MatchLineupPosition, MatchLineupPositionViewModel>();
-            cfg.CreateMap<MatchLineupPositionPlayer,  MatchLineupPositionPlayerViewModel>();
+            cfg.CreateMap<MatchLineupPosition, MatchLineupPositionViewModel>()
+                .ForMember(x => x.Position, act => act.Ignore());
+            cfg.CreateMap<MatchLineupPositionPlayer,  MatchLineupPositionPlayerViewModel>()
+                .ForMember(x => x.Player, act => act.Ignore());
 
             cfg.CreateMap<PositionModel, Position>();
             cfg.CreateMap<Position, PositionViewModel>();

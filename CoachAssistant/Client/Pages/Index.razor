@@ -1,2 +1,24 @@
 ﻿@page "/"
+@using CoachAssistant.Client.Pages.Tournaments
+
 @attribute [Authorize]
+@inject IDialogService DialogService
+
+<AuthorizeView Roles="Manager">
+    <Authorized>
+        <MudPaper Class="d-flex flex-column align-center justify-center" MaxWidth="100vw" Height="100vh">
+            <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" OnClick="OpenAddTournamentDialog">Add Tournament</MudButton>
+        </MudPaper>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    private async Task OpenAddTournamentDialog()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var parameters = new DialogParameters();
+
+        var dialog = DialogService.Show<AddTournamentDialog>("Add Tournament", parameters, options);
+        var result = await dialog.Result;
+    }
+}

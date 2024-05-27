@@ -1,0 +1,53 @@
+﻿@page "/match/{MatchId}"
+@inject NavigationManager NavigationManager
+@inject MatchService MatchService
+@inject MatchTeamService MatchTeamService
+
+<MudPaper Elevation="1" Class="pa-4">
+    <MudTabs>
+        <MudTabPanel Text="Lineups">
+            <LineupsTab HomeTeam="@HomeTeam" AwayTeam="@AwayTeam"></LineupsTab>
+        </MudTabPanel>
+        <MudTabPanel Text="Statistics">
+            <StaticticsTab></StaticticsTab>
+        </MudTabPanel>
+    </MudTabs>
+</MudPaper>
+
+@code {
+    [Parameter] 
+    public string MatchId { get; set; }
+
+    public MatchViewModel Match { get; private set; }
+
+    public MatchTeamViewModel HomeTeam { get; private set; }
+
+    public MatchTeamViewModel AwayTeam { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMatchDetails();
+    }
+
+    private async Task LoadMatchDetails()
+    {
+        Match = await MatchService.GetById(MatchId);
+
+        List<MatchTeamViewModel> matchTeams = new();
+
+        foreach (var matchTeam in Match.MatchTeams)
+        {
+            var matchTeamModel = await MatchTeamService.GetById(matchTeam.Id);
+
+            matchTeams.Add(matchTeamModel);
+        }
+
+        Match.MatchTeams = matchTeams;
+
+        if (Match.MatchTeams.Count > 0)
+        {
+            HomeTeam = matchTeams.First(x => x.TeamType == MatchTeamType.Home);
+            AwayTeam = matchTeams.First(x => x.TeamType == MatchTeamType.Away);
+        }
+    }
+}

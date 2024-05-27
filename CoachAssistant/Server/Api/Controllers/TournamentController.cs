@@ -3,6 +3,7 @@ using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
 using CoachAssistant.Shared.Models;
+using CoachAssistant.Shared.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -32,7 +33,7 @@ namespace CoachAssistant.Server.Api.Controllers
 
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TournamentAddedNotification(tournamentViewModel);
 
-            return Ok();
+            return Ok(tournamentViewModel);
         }
 
         [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
@@ -53,11 +54,19 @@ namespace CoachAssistant.Server.Api.Controllers
             return Ok(tournament);
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)},{nameof(ApplicationUserRole.Manager)}")]
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] Guid? teamId)
         {
-            var tournaments = await tournamentService.GetAll();
+            IReadOnlyCollection<TournamentViewModel> tournaments;
+            if (teamId.HasValue)
+            {
+                tournaments = await tournamentService.GetByTeamId(teamId.Value);
+            }
+            else
+            {
+                tournaments = await tournamentService.GetAll();
+            }
 
             return Ok(tournaments);
         }
