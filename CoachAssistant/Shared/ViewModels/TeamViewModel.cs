@@ -8,8 +8,8 @@
 
         public VerificationState VerificationState { get; set; }
 
-        public IReadOnlyCollection<TrainingViewModel> Trainings { get; set; }
+        public List<TrainingViewModel> Trainings { get; set; }
 
-        public IReadOnlyCollection<PlayerViewModel> Players { get; set; }
+        public List<PlayerViewModel> Players { get; set; }
     }
 }

@@ -74,7 +74,9 @@
 
     void AddCriterion(Guid positionId)
     {
-        var parameters = new DialogParameters { ["PositionId"] = positionId };
+        var parameters = new DialogParameters<AddCriterionDialog>();
+        parameters.Add(x => x.PositionId, positionId);
+
         DialogService.Show<AddCriterionDialog>("Add Criteria", parameters, new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small });
     }
 

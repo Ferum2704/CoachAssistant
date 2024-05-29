@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/trainingMarks")]
+    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
     [ApiController]
     public class TrainingMarkController : ControllerBase
     {
@@ -27,7 +28,6 @@ namespace CoachAssistant.Server.Api.Controllers
             this.trainingMarkService = trainingMarkService;
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpPost]
         public async Task<IActionResult> PostTrainingMark(TrainingMarkModel model)
         {
@@ -35,7 +35,15 @@ namespace CoachAssistant.Server.Api.Controllers
 
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TrainingMarkAddedNotification(trainingMarkViewModel);
 
-            return Ok();
+            return Ok(trainingMarkViewModel);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id, TrainingMarkModel model)
+        {
+            var trainingMarkViewModel = await trainingMarkService.Edit(id, model);
+
+            return Ok(trainingMarkViewModel);
         }
     }
 }

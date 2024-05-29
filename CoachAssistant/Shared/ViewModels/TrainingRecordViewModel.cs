@@ -8,6 +8,8 @@
 
         public Guid PlayerId { get; set; }
 
+        public PlayerViewModel Player { get; set; }
+
         public bool IsPresent { get; set; }
 
         public string? Note { get; set; }

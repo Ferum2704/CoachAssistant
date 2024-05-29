@@ -53,9 +53,34 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<TrainingViewModel> Edit(Guid id, TrainingModel model)
+        public async Task<TrainingViewModel> Edit(Guid id, TrainingModel model)
         {
-            throw new NotImplementedException();
+            var training = await unitOfWork.TrainingRepository.GetByIdAsync(id);
+
+            if (training is not null)
+            {
+                if (training.Name != model.Name)
+                {
+                    training.Name = model.Name;
+                }
+                else if (training.Description != model.Description)
+                {
+                    training.Description = model.Description;
+                }
+                else if (training.StartDate != model.StartDate)
+                {
+                    training.StartDate = model.StartDate;
+                }
+                else if (training.Duration != model.Duration)
+                {
+                    training.Duration = model.Duration;
+                }
+
+                unitOfWork.TrainingRepository.Update(training);
+                await unitOfWork.SaveAsync();
+            }
+
+            return mapper.Map<TrainingViewModel>(training);
         }
 
         public async Task<TrainingViewModel> Get(Guid id)

@@ -35,6 +35,8 @@ builder.Services.AddScoped<PositionService>();
 builder.Services.AddScoped<CriterionService>();
 builder.Services.AddScoped<MatchTeamService>();
 builder.Services.AddScoped<PositionCriteriaService>();
+builder.Services.AddScoped<TrainingService>();
+builder.Services.AddScoped<TrainingMarkService>();
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

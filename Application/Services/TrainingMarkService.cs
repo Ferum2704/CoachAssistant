@@ -43,9 +43,19 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<TrainingMarkViewModel> Edit(Guid id, TrainingMarkModel model)
+        public async Task<TrainingMarkViewModel> Edit(Guid id, TrainingMarkModel model)
         {
-            throw new NotImplementedException();
+            var trainingMark = await unitOfWork.TrainingMarkRepository.GetByIdAsync(id);
+
+            if (trainingMark.Mark != model.Mark)
+            {
+                trainingMark.Mark = model.Mark;
+            }
+
+            unitOfWork.TrainingMarkRepository.Update(trainingMark);
+            await unitOfWork.SaveAsync();
+
+            return mapper.Map<TrainingMarkViewModel>(trainingMark);
         }
 
         public Task<TrainingMarkViewModel> Get(Guid id)

@@ -8,6 +8,8 @@
 
         public Guid CriterionId { get; set; }
 
+        public CriterionViewModel Criterion { get; set; }
+
         public float Mark { get; set; }
     }
 }

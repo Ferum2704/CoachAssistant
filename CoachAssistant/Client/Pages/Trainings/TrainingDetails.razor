@@ -1,0 +1,77 @@
+﻿@page "/training-details/{TrainingId}"
+@inject ICurrentTeamProvider CurrentTeamProvider
+@inject NavigationManager NavigationManager
+@inject TrainingService TrainingService
+@inject IDialogService DialogService
+
+<MudPaper Class="pa-4">
+    @if (training is not null)
+    {
+        <MudText Typo="Typo.h4" GutterBottom="true">@training.Name</MudText>
+        <MudText>@training.StartDate.Value.ToString("g") - @training.StartDate.Value.AddHours(training.Duration).ToString("g")</MudText>
+        <MudText GutterBottom="true">@training.Description</MudText>
+
+        <MudText Typo="Typo.h5" Class="mt-4 mb-2">Training records</MudText>
+        <MudTable Items="@training.TrainingRecords" Dense>
+             <HeaderContent>
+                <MudTh Style="width: 70%;">Player name</MudTh>
+                <MudTh>Presence</MudTh>
+                <MudTh>Actions</MudTh>
+             </HeaderContent>
+            <RowTemplate>
+                <MudTd>@($"{context.Player.Name} {context.Player.Surname}")</MudTd>
+                <MudTd>
+                    <MudIcon Icon="@((context.IsPresent ? Icons.Filled.Check : Icons.Filled.Close))"
+                            Color="@(context.IsPresent ? Color.Success : Color.Error)"
+                            Size="Size.Large" />
+                </MudTd>
+                <MudTd>
+                    <MudButton OnClick="@(() => CheckPresence(context))" Color="Color.Primary">Check Presence</MudButton>
+                    <MudButton OnClick="@(() => ViewDetails(context))" Color="Color.Secondary">View Details</MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string TrainingId { get; set; }
+
+    private TrainingViewModel training;
+    private TeamViewModel currentTeam;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTraining();
+    }
+
+    private void CheckPresence(TrainingRecordViewModel record)
+    {
+        record.IsPresent = !record.IsPresent;
+    }
+
+    private async Task ViewDetails(TrainingRecordViewModel record)
+    {
+        var parameters = new DialogParameters<PlayerTrainingDetails>();
+        parameters.Add(x => x.Record, record);
+
+        var dialog = DialogService.Show<PlayerTrainingDetails>(
+            $"{record.Player.Name} {record.Player.Surname}",
+            parameters,
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium });
+        var result = await dialog.Result;
+
+        await LoadTraining();
+    }
+
+    private async Task LoadTraining()
+    {
+        currentTeam = CurrentTeamProvider.CurrentClub.Team;
+        training = await TrainingService.GetById(currentTeam.Id, new Guid(TrainingId));
+        foreach (var record in training.TrainingRecords)
+        {
+            record.Player = currentTeam.Players.FirstOrDefault(p => p.Id == record.PlayerId);
+        }
+    }
+}

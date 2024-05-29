@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CoachAssistant.Client.Entities;
+using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared.ViewModels;
 
 namespace CoachAssistant.Client.Configurations
@@ -21,6 +22,8 @@ namespace CoachAssistant.Client.Configurations
             cfg.CreateMap<TeamViewModel, TeamViewEntity>();
             cfg.CreateMap<PlayerViewModel, PlayerViewEntity>();
             cfg.CreateMap<TrainingViewModel, TrainingViewEntity>();
+            cfg.CreateMap<TrainingViewModel, TrainingModel>();
+            cfg.CreateMap<TrainingMarkViewModel, TrainingMarkModel>();
         }
     }
 }

@@ -1,0 +1,163 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h5">Estimate performance for Emily Johnson</MudText>
+        <MudGrid Class="mt-4">
+            <MudItem xs="12">
+                <MudText Typo="Typo.body1">Select a position to estimate the player:</MudText>
+                <MudSelect T="Guid?" Label="Position" @bind-Value="SelectedPositionId" Variant="Variant.Filled">
+                    <MudSelectItem Value="@((Guid?)null)" Disabled="true">Select a position</MudSelectItem>
+                    @foreach (var position in positions)
+                    {
+                        <MudSelectItem T="Guid?" Value="@position.Id">@position.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            @if (showWarning)
+            {
+                <MudItem xs="12">
+                    <MudAlert Severity="Severity.Warning">
+                        Changing the position will overwrite previously set estimations for shared criteria.
+                    </MudAlert>
+                </MudItem>
+            }
+
+            @foreach (var mark in currentMarks)
+            {
+                @if (mark.Criterion is not null)
+                {
+                    <MudItem xs="12" Class="mt-2">
+                        <MudText Typo="Typo.subtitle1">@mark.Criterion.Name</MudText>
+                            <MudSlider Min="0" Max="10" Step="1" Value="@mark.Mark" ValueChanged="@((float value) => SetCriterionValue(mark.CriterionId, value))" Color="Color.Primary" />
+                            <MudText>@mark.Mark</MudText>
+                        </MudItem>
+                }
+            }
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@CloseDialog" Color="Color.Secondary">Close</MudButton>
+        <MudButton OnClick="@Save" Color="Color.Primary">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@inject IMapper Mapper
+@inject PositionService PositionService
+@inject CriterionService CriterionService
+@inject TrainingMarkService TrainingMarkService
+
+@code {
+    private List<PositionViewModel> positions;
+    private List<TrainingMarkViewModel> currentMarks = new();
+    private List<TrainingMarkViewModel> updatedMarks = new();
+    private List<TrainingMarkViewModel> allMarks = new();
+    private Guid? selectedPositionId = null;
+    private bool showWarning;
+
+    [Parameter]
+    public TrainingRecordViewModel Record { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public Guid? SelectedPositionId
+    {
+        get => selectedPositionId;
+        set
+        {
+            selectedPositionId = value;
+            PositionChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        positions = PositionService.Positions;
+        foreach (var positionCriteria in positions.SelectMany(x => x.Criteria))
+        {
+            positionCriteria.Criterion = CriterionService.Criteria.First(x => x.Id == positionCriteria.CriterionId);
+        }
+
+        allMarks.AddRange(Record.TrainingMarks);
+    }
+
+    private void PositionChanged()
+    {
+        var newPosition = PositionService.Positions.First(x => x.Id == selectedPositionId);
+        var marksWithRepeatingCriteria = allMarks.Where(x => newPosition.Criteria.Any(c => c.CriterionId == x.CriterionId));
+        if (marksWithRepeatingCriteria.Any(x => x.Mark > 0))
+        {
+            showWarning = true;
+        }
+        else
+        {
+            showWarning = false;
+        }
+
+        currentMarks.Clear();
+        foreach (var positionCriterion in newPosition.Criteria)
+        {
+            var currentCriterionMark = allMarks.FirstOrDefault(x => x.CriterionId == positionCriterion.Criterion.Id);
+
+            if (currentCriterionMark is null)
+            {
+                var markModel = new TrainingMarkViewModel()
+                    {
+                        TrainingRecordId = Record.Id,
+                        CriterionId = positionCriterion.Criterion.Id,
+                        Criterion = positionCriterion.Criterion,
+                        Mark = 0f
+                    };
+                currentMarks.Add(markModel);
+                allMarks.Add(markModel);
+            }
+            else
+            {
+                currentCriterionMark.Criterion = positionCriterion.Criterion;
+                currentMarks.Add(currentCriterionMark);
+            }
+        }
+    }
+
+    private void SetCriterionValue(Guid criterionId, float value)
+    {
+        var mark = allMarks.First(x => x.CriterionId == criterionId);
+        if (mark != null && mark.Mark != value)
+        {
+            if (mark.Mark != 0 && !updatedMarks.Any(x => x.Id == mark.Id))
+            {
+                updatedMarks.Add(mark);
+            }
+            mark.Mark = value;
+        }
+    }
+
+    private async Task Save()
+    {
+        var addedMarks = allMarks.Where(x => x.Mark > 0 && !Record.TrainingMarks.Any(m => m.CriterionId == x.CriterionId)).ToList();
+
+        if (addedMarks.Count > 0)
+        {
+            var marksModels = Mapper.Map<List<TrainingMarkModel>>(addedMarks);
+
+            foreach (var markModel in marksModels)
+            {
+                await TrainingMarkService.Add(markModel);
+            }
+        }
+        
+        if (updatedMarks.Count > 0)
+        {
+            foreach (var markModel in updatedMarks)
+            {
+                await TrainingMarkService.Edit(markModel.Id, Mapper.Map<TrainingMarkModel>(markModel));
+            }
+        }
+
+        MudDialog.Close();
+    }
+
+    private void CloseDialog()
+    {
+        MudDialog.Cancel();
+    }
+}

@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/teams/{teamId}/trainings")]
+    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
     [ApiController]
     public class TrainingController : ControllerBase
     {
@@ -25,7 +25,6 @@ namespace CoachAssistant.Server.Api.Controllers
             this.trainingService = trainingService;
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpPost]
         public async Task<IActionResult> PostTraining(Guid teamId, TrainingModel model)
         {
@@ -34,16 +33,31 @@ namespace CoachAssistant.Server.Api.Controllers
 
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TrainingAddedNotification(trainingViewModel);
 
-            return Ok();
+            return Ok(trainingViewModel);
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         [HttpGet("{trainingId}")]
         public async Task<IActionResult> GetTraining(Guid trainingId)
         {
             var trainingViewModel = await trainingService.Get(trainingId);
 
             return Ok(trainingViewModel);
+        }
+
+        [HttpPut("{trainingId}")]
+        public async Task<IActionResult> Put(Guid trainingId, TrainingModel training)
+        {
+            var trainingViewModel = await trainingService.Edit(trainingId, training);
+
+            return Ok(trainingViewModel);
+        }
+
+        [HttpDelete("{trainingId}")]
+        public async Task<IActionResult> Delete(Guid trainingId)
+        {
+            await trainingService.Delete(trainingId);
+
+            return Ok();
         }
     }
 }

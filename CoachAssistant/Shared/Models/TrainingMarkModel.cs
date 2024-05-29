@@ -1,4 +1,6 @@
-﻿namespace CoachAssistant.Shared.Models
+﻿using CoachAssistant.Shared.ViewModels;
+
+namespace CoachAssistant.Shared.Models
 {
     public class TrainingMarkModel
     {

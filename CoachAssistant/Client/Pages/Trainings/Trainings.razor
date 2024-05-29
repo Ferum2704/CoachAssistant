@@ -1,0 +1,158 @@
+﻿@page "/trainings"
+@inject ICurrentTeamProvider CurrentTeamProvider
+@inject IDialogService DialogService
+@inject TrainingService TrainingService
+@inject IMapper Mapper;
+@inject NavigationManager NavigationManager
+
+<MudGrid>
+    <MudItem xs="12" Style="text-align: right;">
+        <MudButton Color="Color.Primary" OnClick="AddTraining">Add Training</MudButton>
+    </MudItem>
+    <MudItem xs="12" Class="my-4" Style="text-align: center;">
+        <MudDatePicker @bind-Date="SelectedDate" PickerVariant="PickerVariant.Dialog" Variant="Variant.Filled"
+                       DateFormat="yyyy MMMM" />
+    </MudItem>
+    <MudItem xs="12">
+        @if (trainingsGroupedByMonth != null)
+        {
+            foreach (var training in trainingsGroupedByMonth)
+            {
+                <MudCard Style="margin: 10px; box-shadow: 4px 4px 10px rgba(0,0,0,0.2);">
+                    <MudCardContent>
+                        <MudGrid Style="align-items: center;">
+                            <MudItem xs="9">
+                                <MudText Typo="Typo.h6" Style="font-weight: bold;">@training.Name</MudText>
+                                <MudText>@training.StartDate.Value.ToString("g") - @training.StartDate.Value.AddHours(training.Duration).ToString("g")</MudText>
+                                <MudText Style="color: gray;">@training.Description</MudText>
+                            </MudItem>
+                            <MudItem xs="3" Style="text-align: right;">
+                                <MudButton OnClick="() => EditTraining(training)" Color="Color.Primary" Variant="Variant.Filled" Style="margin-right: 10px;">Edit</MudButton>
+                                <MudButton OnClick="() => ConfirmRemoveTraining(training)" Color="Color.Error" Variant="Variant.Filled">Remove</MudButton>
+                                <MudIconButton OnClick="() => NavigateToTraining(training.Id)" Icon="@Icons.Filled.ArrowForward"/> 
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            }
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    private IReadOnlyCollection<TrainingViewModel> trainings;
+    private DateTime? selectedDate = DateTime.Today;
+    private List<TrainingViewModel> trainingsGroupedByMonth;
+    private int activeSlideIndex = 0;
+    private bool isEditMode;
+    private TeamViewModel currentTeam;
+
+    public DateTime? SelectedDate
+    {
+        get => selectedDate;
+        set
+        {
+            selectedDate = value;
+            GroupTrainings();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        currentTeam = CurrentTeamProvider.CurrentClub.Team;
+        LoadTrainings();
+    }
+
+    private void LoadTrainings()
+    {
+        trainings = currentTeam.Trainings;
+        if (selectedDate.HasValue)
+        {
+            GroupTrainings();
+        }
+    }
+
+    private void GroupTrainings()
+    {
+        if (selectedDate.HasValue)
+        {
+            int selectedYear = selectedDate.Value.Year;
+            int selectedMonth = selectedDate.Value.Month;
+
+            // Filter and group trainings by the selected month and year
+            trainingsGroupedByMonth = trainings
+                                      .Where(t => t.StartDate.Value.Year == selectedYear && t.StartDate.Value.Month == selectedMonth)
+                                      .OrderBy(x => x.StartDate)
+                                      .ToList();
+            StateHasChanged();
+        }
+    }
+
+    private async void AddTraining()
+    {
+        isEditMode = false;
+        var parameters = new DialogParameters<AddEditTrainingDialog>();
+
+        var dialog = DialogService.Show<AddEditTrainingDialog>(
+            isEditMode ? "Edit Training" : "Add Training",
+            parameters,
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small });
+        var result = (await dialog.Result).Data as TrainingViewModel;
+        var trainingModel = Mapper.Map<TrainingModel>(result);
+
+        var training = await TrainingService.Add(currentTeam.Id, trainingModel);
+
+        if (training is not null)
+        {
+            currentTeam.Trainings.Add(training);
+            GroupTrainings();
+        }
+    }
+
+    private async void EditTraining(TrainingViewModel trainingViewModel)
+    {
+        isEditMode = true;
+        var parameters = new DialogParameters<AddEditTrainingDialog>();
+        parameters.Add(x => x.Training, trainingViewModel);
+
+        var dialog = DialogService.Show<AddEditTrainingDialog>(
+            isEditMode ? "Edit Training" : "Add Training",
+            parameters,
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small });
+        var result = (await dialog.Result).Data as TrainingViewModel;
+        var trainingModel = Mapper.Map<TrainingModel>(result);
+
+        var training = await TrainingService.Edit(currentTeam.Id, trainingViewModel.Id, trainingModel);
+
+        if (training is not null)
+        {
+            var index = currentTeam.Trainings.IndexOf(trainingViewModel);
+            currentTeam.Trainings[index] = training;
+            GroupTrainings();
+        }
+    }
+
+    private async void ConfirmRemoveTraining(TrainingViewModel trainingViewModel)
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Confirm Deletion",
+            $"Are you sure you want to delete the training: {trainingViewModel.Name}?",
+            yesText: "Yes", cancelText: "No"
+        );
+
+        if (confirmed == true)
+        {
+            RemoveTraining(trainingViewModel);
+        }
+    }
+
+    private async void RemoveTraining(TrainingViewModel trainingViewModel)
+    {
+        await TrainingService.Delete(currentTeam.Id, trainingViewModel.Id);
+        currentTeam.Trainings.Remove(trainingViewModel);
+        GroupTrainings();
+    }
+
+    private void NavigateToTraining(Guid trainingId) =>
+        NavigationManager.NavigateTo($"/training-details/{trainingId}");
+}
