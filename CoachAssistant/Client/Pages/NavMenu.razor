@@ -56,7 +56,6 @@
             else if (isCoach)
             {
 
-                await PositionService.GetAll();
                 await CriterionService.GetAll();
 
                 var clubViewModel = await HttpClientService.GetAsync<ClubViewModel>(ApiUrls.CoachTeamUrl);
@@ -68,6 +67,8 @@
 
                 await TournamentService.LoadTeamTournaments(CurrentTeamProvider.CurrentClub.Team.Id);
             }
+
+            await PositionService.GetAll();
         }
     }
 

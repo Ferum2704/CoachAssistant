@@ -18,6 +18,7 @@ namespace Application.Topsis
 
         public async Task CalculateBestLineup(MatchTeam matchTeam)
         {
+            await CleanAllPositionPlayers(matchTeam);
             var teamTrainings = await unitOfWork.TrainingRepository.GetAsync(x => x.TeamId == matchTeam.TeamId);
             var lastThreeTrainings = teamTrainings.OrderByDescending(x => x.StartDate).Take(3).ToList();
 
@@ -48,6 +49,17 @@ namespace Application.Topsis
                         await unitOfWork.SaveAsync();
                     }
                 }
+            }
+        }
+
+        private async Task CleanAllPositionPlayers(MatchTeam matchTeam)
+        {
+            foreach (var position in matchTeam.LineupPositions)
+            {
+                var positionPlayers = await unitOfWork.MatchLineupPositionPlayerRepository.GetAsync(x => x.MatchLineupPositionId == position.Id);
+
+                unitOfWork.MatchLineupPositionPlayerRepository.RemoveRange(positionPlayers);
+                await unitOfWork.SaveAsync();
             }
         }
     }

@@ -6,6 +6,8 @@
 
         public Guid PlayerId { get; set; }
 
+        public PlayerViewModel Player { get; set; }
+
         public Guid MatchId { get; set; }
 
         public Guid ActionTypeId { get; set; }

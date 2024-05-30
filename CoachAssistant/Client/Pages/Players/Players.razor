@@ -1,78 +1,115 @@
 ﻿@page "/players"
 
-@inject IHttpClientService HttpClientService
+@inject PlayerService PlayerService
 @inject IDialogService DialogService
 @inject ICurrentTeamProvider CurrentTeamProvider
+@inject IMapper Mapper;
+@inject NavigationManager NavigationManager
 
-<MudGrid>
-    <MudItem xs="12">
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OpenAddPlayerDialog" Style="float: right;">Add Player</MudButton>
-    </MudItem>
-    <MudItem xs="12">
-        <MudTable Items="@players">
-            <HeaderContent>
-                <MudTh>First Name</MudTh>
-                <MudTh>Last Name</MudTh>
-                <MudTh>Email</MudTh>
-                <MudTh>Actions</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="First Name">@context.Name</MudTd>
-                <MudTd DataLabel="Last Name">@context.Surname</MudTd>
-                <MudTd DataLabel="Email">@context.Email</MudTd>
-                <MudTd>
-                    <MudButton Icon="@Icons.Filled.Edit" OnClick="@(() => EditPlayer(context))">Edit</MudButton>
-                    <MudButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(() => DeletePlayer(context))">Delete</MudButton>
-                </MudTd>
-            </RowTemplate>
-         </MudTable>
-    </MudItem>
-</MudGrid>
+<MudPaper Elevation="1" Class="pa-4">
+    <MudGrid>
+        <MudItem xs="12" Class="d-flex justify-end">
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddPlayer">Add Player</MudButton>
+        </MudItem>
+        <MudItem xs="12">
+            <MudTable Items="@players" Dense="true" Striped="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh><MudText Typo="Typo.h6">First Name</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.h6">Last Name</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.h6">Email</MudText></MudTh>
+                    <MudTh Style="width: 20%"><MudText Typo="Typo.h6">Actions</MudText></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="First Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Last Name">@context.Surname</MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd Class="d-flex justify-space-around">
+                        <MudButton StartIcon="@Icons.Filled.Edit" Color="Color.Secondary" OnClick="@(() => EditPlayer(context))">Edit</MudButton>
+                        <MudButton StartIcon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(() => ConfirmRemovePlayer(context))">Delete</MudButton>
+                        <MudIconButton Icon="@Icons.Filled.ArrowForward" Color="Color.Primary" OnClick="@(() => ViewDetails(context))"></MudIconButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
 
     @code {
     private List<PlayerViewModel> players = new();
+    private TeamViewModel currentTeam;
 
-    protected override async Task OnInitializedAsync()
+    private bool isEditMode;
+
+    protected override void OnInitialized()
     {
-        var currentClub = CurrentTeamProvider.CurrentClub;
+        currentTeam = CurrentTeamProvider.CurrentClub.Team;
+        players = currentTeam.Players.ToList();
+    }
 
-        if (currentClub is null)
+    private void ViewDetails(PlayerViewModel player)
+    {
+        NavigationManager.NavigateTo($"/player-details/{player.Id}");
+    }
+
+    private async Task AddPlayer()
+    {
+        isEditMode = false;
+        var parameters = new DialogParameters<AddEditPlayerDialog>();
+
+        var dialog = DialogService.Show<AddEditPlayerDialog>(
+            isEditMode ? "Edit Player" : "Add Player",
+            parameters,
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var result = (await dialog.Result).Data as PlayerViewModel;
+        var playerModel = Mapper.Map<PlayerModel>(result);
+
+        var player = await PlayerService.Add(currentTeam.Id, playerModel);
+
+        if (player is not null)
         {
-            var clubViewModel = await HttpClientService.GetAsync<ClubViewModel>(ApiUrls.CoachTeamUrl);
-
-            if (clubViewModel is not null)
-            {
-                CurrentTeamProvider.CurrentClub = clubViewModel;
-
-                currentClub = CurrentTeamProvider.CurrentClub;
-            }
+            players.Add(player);
         }
-
-        players = currentClub.Team.Players.ToList();
     }
 
-    private async Task OpenAddPlayerDialog()
+    private async Task EditPlayer(PlayerViewModel playerViewModel)
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
-        var parameters = new DialogParameters();
+        isEditMode = true;
+        var parameters = new DialogParameters<AddEditPlayerDialog>();
+        parameters.Add(x => x.Player, playerViewModel);
 
-        var dialog = DialogService.Show<AddPlayerDialog>("Add Player", parameters, options);
-        var result = await dialog.Result;
+        var dialog = DialogService.Show<AddEditPlayerDialog>(
+            isEditMode ? "Edit Player" : "Add Player",
+            parameters,
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var result = (await dialog.Result).Data as PlayerViewModel;
+        var playerModel = Mapper.Map<PlayerModel>(result);
 
-        if (!result.Cancelled)
+        var player = await PlayerService.Edit(currentTeam.Id, playerViewModel.Id, playerModel);
+
+        if (player is not null)
         {
-            var newPlayer = result.Data as PlayerViewModel;
-            players.Add(newPlayer);
+            var index = currentTeam.Players.IndexOf(playerViewModel);
+            currentTeam.Players[index] = player;
         }
     }
 
-    private void EditPlayer(PlayerViewModel player)
+    private async Task ConfirmRemovePlayer(PlayerViewModel player)
     {
-        // Implement edit player logic
+        var confirmed = await DialogService.ShowMessageBox(
+            "Confirm Deletion",
+            $"Are you sure you want to delete the player: {player.Name} {player.Surname}?",
+            yesText: "Yes", cancelText: "No"
+        );
+
+        if (confirmed == true)
+        {
+            await RemovePlayer(player);
+        }
     }
 
-    private void DeletePlayer(PlayerViewModel player)
+    private async Task RemovePlayer(PlayerViewModel player)
     {
-        // Implement delete player logic
+        await PlayerService.Delete(currentTeam.Id, player.Id);
+        players.Remove(player);
     }
 }

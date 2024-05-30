@@ -121,5 +121,14 @@ namespace Application.Services
 
             return clubViewModel;
         }
+
+        public async Task<List<ClubViewModel>> GetByTournamentId(Guid tournamentId)
+        {
+            var teams = await unitOfWork.TeamRepository.GetAsync(x => x.Tournaments.Select(t => t.Id).Contains(tournamentId));
+
+            var clubs = await unitOfWork.ClubRepository.GetAsync(x => teams.Select(t => t.ClubId).Contains(x.Id));
+
+            return mapper.Map<List<ClubViewModel>>(clubs);
+        }
     }
 }

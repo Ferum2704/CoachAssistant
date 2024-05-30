@@ -2,6 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject MatchService MatchService
 @inject MatchTeamService MatchTeamService
+@inject PlayerService PlayerService
 
 <MudPaper Elevation="1" Class="pa-4">
     <MudTabs>
@@ -9,7 +10,7 @@
             <LineupsTab HomeTeam="@HomeTeam" AwayTeam="@AwayTeam"></LineupsTab>
         </MudTabPanel>
         <MudTabPanel Text="Statistics">
-            <StaticticsTab></StaticticsTab>
+            <StaticticsTab HomeTeam="@HomeTeam" AwayTeam="@AwayTeam"></StaticticsTab>
         </MudTabPanel>
     </MudTabs>
 </MudPaper>
@@ -48,6 +49,9 @@
         {
             HomeTeam = matchTeams.First(x => x.TeamType == MatchTeamType.Home);
             AwayTeam = matchTeams.First(x => x.TeamType == MatchTeamType.Away);
+
+            HomeTeam.Team.Players = await PlayerService.GetByTeamId(HomeTeam.TeamId);
+            AwayTeam.Team.Players = await PlayerService.GetByTeamId(AwayTeam.TeamId);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
@@ -24,7 +23,7 @@ namespace CoachAssistant.Server.Api.Controllers
             this.hubContext = hubContext;
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}, {nameof(ApplicationUserRole.Manager)}")]
         [HttpGet("{matchId}")]
         public async Task<IActionResult> GetById(Guid matchId)
         {

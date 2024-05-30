@@ -43,7 +43,6 @@
     private IReadOnlyCollection<TrainingViewModel> trainings;
     private DateTime? selectedDate = DateTime.Today;
     private List<TrainingViewModel> trainingsGroupedByMonth;
-    private int activeSlideIndex = 0;
     private bool isEditMode;
     private TeamViewModel currentTeam;
 
@@ -88,7 +87,7 @@
         }
     }
 
-    private async void AddTraining()
+    private async Task AddTraining()
     {
         isEditMode = false;
         var parameters = new DialogParameters<AddEditTrainingDialog>();
@@ -96,7 +95,7 @@
         var dialog = DialogService.Show<AddEditTrainingDialog>(
             isEditMode ? "Edit Training" : "Add Training",
             parameters,
-            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small });
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
         var result = (await dialog.Result).Data as TrainingViewModel;
         var trainingModel = Mapper.Map<TrainingModel>(result);
 
@@ -109,7 +108,7 @@
         }
     }
 
-    private async void EditTraining(TrainingViewModel trainingViewModel)
+    private async Task EditTraining(TrainingViewModel trainingViewModel)
     {
         isEditMode = true;
         var parameters = new DialogParameters<AddEditTrainingDialog>();
@@ -118,7 +117,7 @@
         var dialog = DialogService.Show<AddEditTrainingDialog>(
             isEditMode ? "Edit Training" : "Add Training",
             parameters,
-            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small });
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
         var result = (await dialog.Result).Data as TrainingViewModel;
         var trainingModel = Mapper.Map<TrainingModel>(result);
 
@@ -132,7 +131,7 @@
         }
     }
 
-    private async void ConfirmRemoveTraining(TrainingViewModel trainingViewModel)
+    private async Task ConfirmRemoveTraining(TrainingViewModel trainingViewModel)
     {
         var confirmed = await DialogService.ShowMessageBox(
             "Confirm Deletion",
@@ -142,11 +141,11 @@
 
         if (confirmed == true)
         {
-            RemoveTraining(trainingViewModel);
+            await RemoveTraining(trainingViewModel);
         }
     }
 
-    private async void RemoveTraining(TrainingViewModel trainingViewModel)
+    private async Task RemoveTraining(TrainingViewModel trainingViewModel)
     {
         await TrainingService.Delete(currentTeam.Id, trainingViewModel.Id);
         currentTeam.Trainings.Remove(trainingViewModel);

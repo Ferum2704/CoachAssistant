@@ -1,0 +1,34 @@
+﻿<MudDialog>
+    <DialogContent>
+        <EditForm Model="@Player">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Name" @bind-Value="Player.Name" FullWidth />
+                    <MudTextField T="string" Label="Surname" @bind-Value="Player.Surname" FullWidth />
+                    <MudTextField T="string" Label="Email" @bind-Value="Player.Email" FullWidth />
+                    <MudTextField T="float" Label="Height (in meters)" @bind-Value="Player.Height" FullWidth />
+                    <MudTextField T="float" Label="Weight (in kg)" @bind-Value="Player.Weight" FullWidth />
+                 </MudItem>
+             </MudGrid>
+         </EditForm>
+     </DialogContent>
+     <DialogActions>
+         <MudButton OnClick="@Save" Color="Color.Primary" Variant="Variant.Filled">Save</MudButton>
+     </DialogActions>
+ </MudDialog>
+
+@code {
+    [Parameter]
+    public PlayerViewModel Player { get; set; } = new();
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private void Save()
+    {
+        MudDialog.Close(Player);
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Close();
+    }
+}

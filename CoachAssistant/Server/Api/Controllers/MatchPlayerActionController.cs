@@ -35,7 +35,16 @@ namespace CoachAssistant.Server.Api.Controllers
 
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).MatchPlayerActionAddedNotification(playerActionViewModel);
 
-            return Ok();
+            return Ok(playerActionViewModel);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id,MatchPlayerActionModel model)
+        {
+            var playerActionViewModel = await matchPlayerActionService.Edit(id, model);
+
+            return Ok(playerActionViewModel);
         }
     }
 }

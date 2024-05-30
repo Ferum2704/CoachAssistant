@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
@@ -41,9 +40,9 @@ namespace CoachAssistant.Server.Api.Controllers
         [HttpPut("{matchTeamId}")]
         public async Task<IActionResult> Put(Guid matchTeamId, MatchTeamModel model)
         {
-            await matchTeamService.Edit(matchTeamId, model);
+            var matchTeam = await matchTeamService.Edit(matchTeamId, model);
 
-            return Ok();
+            return Ok(matchTeam);
         }
 
         [HttpGet("{matchTeamId}")]

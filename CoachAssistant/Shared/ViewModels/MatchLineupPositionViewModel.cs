@@ -10,6 +10,6 @@
 
         public Guid MatchTeamId { get; set; }
 
-        public IReadOnlyCollection<MatchLineupPositionPlayerViewModel> MatchLineupPositionPlayers { get; set; }
+        public List<MatchLineupPositionPlayerViewModel> MatchLineupPositionPlayers { get; set; }
     }
 }

@@ -1,50 +1,115 @@
 ﻿@inject TeamService TeamService
+@inject TournamentTeamService TournamentTeamService
 @inject NavigationManager NavigationManager
+@inject IAccountManager AccountManager
+@inject IDialogService DialogService
 
-<MudText Typo="Typo.h6">Teams in this Tournament</MudText>
-<MudButton OnClick="@AddTeam">Add Team</MudButton>
-<MudTable Items="@teams">
-    <HeaderContent>
-        <MudTh>Name</MudTh>
-        <MudTh>Verification State</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>@context.Name</MudTd>
-            <MudTd>@context.VerificationState</MudTd>
-        </RowTemplate>
-</MudTable>
+<MudPaper Elevation="1" Class="pa-4 my-2">
+    @if (Tournament is not null)
+    {
+        <MudGrid Class="mb-2">
+            <MudItem xs="9">
+                <MudText Typo="Typo.h5">Teams in @Tournament.Name</MudText>
+                </MudItem>
+                <MudItem xs="3" Class="d-flex justify-end">
+                    @if (isManager)
+                {
+                    <MudButton OnClick="@AddTeam" Color="Color.Primary" Variant="Variant.Filled">Add Team</MudButton>
+                }
+            </MudItem>
+        </MudGrid>
+        <MudTable Items="@clubs" Striped="true">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>City</MudTh>
+                <MudTh Style="width: 20%">Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                    <MudTd>@context.City</MudTd>
+                    <MudTd>
+                        @if (isManager)
+                    {
+                        <MudButton Icon="@Icons.Filled.Delete" Color="Color.Error" Disabled="@IsScheduleGenerated" OnClick="@(() => RemoveTeam(context))">Remove</MudButton>
+                    }
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
 
-    @code {
+@code {
     private TournamentViewModel tournament;
-    private List<TeamViewModel> teams = new();
+    private List<ClubViewModel> clubs = new();
+    private bool isManager;
 
     [Parameter]
-    public TournamentViewModel Tournament
+    public TournamentViewModel Tournament { get; set; }
+
+
+    public bool IsScheduleGenerated => Tournament.Matches.Any();
+
+    protected override async Task OnParametersSetAsync()
     {
-        get => tournament;
-        set
-        {
-            tournament = value;
-            LoadTeams();
-        }
+        await LoadClubs();
     }
 
     protected override async Task OnInitializedAsync()
     {
+        isManager = await AccountManager.IsUserInRole("Manager");
+        await LoadClubs();
     }
 
-    void LoadTeams()
+    private async Task LoadClubs()
     {
         if (Tournament != null)
         {
-            var teamsIds = Tournament.TournamentTeams.Select(x => x.TeamId).Distinct().ToList();
-
-            teams = TeamService.GetTournamentsTeams(teamsIds);
+            clubs = await TeamService.GetTournamentTeams(Tournament.Id);
         }
     }
 
-    private void AddTeam()
+    private async Task AddTeam()
     {
-        //NavigationManager.NavigateTo($"/addteam/{TournamentId}");
+        var availableTeams = TeamService.Teams.Where(x => !clubs.Select(x => x.Team.Id).Contains(x.Team.Id)).Select(x => x.Team).ToList();
+        var parameters = new DialogParameters<SelectTeamsDialog>();
+        parameters.Add(x => x.AvailableTeams, availableTeams);
+
+        var dialog = DialogService.Show<SelectTeamsDialog>(
+            "Add team",
+            parameters,
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+        var result = (await dialog.Result).Data as IEnumerable<Guid?>;
+
+        if (result is not null)
+        {
+            foreach (var teamId in result)
+            {
+                if (teamId.HasValue)
+                {
+                    var newTournamentTeam = await TournamentTeamService.Post(new TournamentTeamModel()
+                        {
+                            TournamentId = Tournament.Id,
+                            TeamId = teamId.Value
+                        });
+                }
+
+                clubs.Add(TeamService.Teams.First(x => x.Team.Id == teamId));
+            }
+        }
+    }
+
+    private async Task RemoveTeam(ClubViewModel club)
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Confirm Deletion",
+            $"Are you sure you want to remove team from tournament: {club.Name}?",
+            yesText: "Yes", cancelText: "No"
+        );
+
+        if (confirmed == true)
+        {
+            await TournamentTeamService.Delete(Tournament.TournamentTeams.First(x => x.TeamId == club.Team.Id).Id);
+            clubs.Remove(club);
+        }
     }
 }

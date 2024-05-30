@@ -16,6 +16,6 @@
 
         public IReadOnlyCollection<TrainingRecordViewModel> TrainingRecords { get; set; }
 
-        public IReadOnlyCollection<MatchPlayerActionViewModel> MatchPlayerActions { get; set; }
+        public List<MatchPlayerActionViewModel> MatchPlayerActions { get; set; }
     }
 }

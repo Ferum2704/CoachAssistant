@@ -30,6 +30,18 @@
 
         public static string TrainingMarksUrl => $"{BaseUrl}/trainingMarks";
 
+        public static string TournamentTeamsUrl => $"{BaseUrl}/tournamentTeams";
+
+        public static string PositionsPlayersUrl => $"{BaseUrl}/positionPlayers";
+
+        public static string MatchPlayerActionsUrl => $"{BaseUrl}/playerActions";
+
+        public static string ActionTypesUrl => $"{BaseUrl}/actionTypes";
+
+        public static string GetPlayersUrl(Guid teamId) => string.Format(PlayersUrl, teamId);
+
+        public static string GetPlayerByIdUrl(Guid teamId, Guid playerId) => $"{string.Format(PlayersUrl, teamId)}/{playerId}";
+
         public static string GetPostPlayerUrl(Guid teamId) => string.Format(PlayersUrl, teamId);
 
         public static string GetTournamentByIdUrl(string tournamentId) => $"{TournamentsUrl}/{tournamentId}";
@@ -49,5 +61,17 @@
         public static string GetTrainingByIdUrl(Guid teamId, Guid trainingId) => $"{TeamsUrl}/{teamId}/trainings/{trainingId}";
 
         public static string GetTrainingMarkByIdUrl(Guid trainingMarkId) => $"{TrainingMarksUrl}/{trainingMarkId}";
+
+        public static string GetTournamentTeamsUrl(Guid tournamentId) => $"{TeamsUrl}?tournamentId={tournamentId}";
+
+        public static string GetTournamentTeamByIdUrl(Guid tournamentTeamId) => $"{TournamentTeamsUrl}/{tournamentTeamId}";
+
+        public static string GetLineupByMatchTeamIdUrl(Guid matchTeamId) => $"{MatchTeamsUrl}/{matchTeamId}/lineup";
+
+        public static string GetRemovePlayersByPositionIdUrl(Guid positionId) => $"{PositionsPlayersUrl}?positionId={positionId}";
+
+        public static string GetMatchPlayerActionByIdUrl(Guid playerActionId) => $"{MatchPlayerActionsUrl}/{playerActionId}";
+
+        public static string GetPlayersByTeamIdUrl(Guid teamId) => $"{PlayersUrl}?teamId={teamId}";
     }
 }

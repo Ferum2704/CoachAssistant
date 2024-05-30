@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.SignalR;
 namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/teams/{teamId}/players")]
-    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
     [ApiController]
     public class PlayerController : ControllerBase
     {
@@ -26,6 +25,7 @@ namespace CoachAssistant.Server.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         public async Task<IActionResult> PostPlayer(Guid teamId, PlayerModel model)
         {
             model.TeamId = teamId;
@@ -37,6 +37,7 @@ namespace CoachAssistant.Server.Api.Controllers
         }
 
         [HttpGet("{playerId}")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         public async Task<IActionResult> GetById(Guid playerId)
         {
             var playerViewModel = await playerService.Get(playerId);
@@ -44,7 +45,26 @@ namespace CoachAssistant.Server.Api.Controllers
             return Ok(playerViewModel);
         }
 
+        [HttpPut("{playerId}")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        public async Task<IActionResult> Put(Guid playerId, PlayerModel model)
+        {
+            var playerViewModel = await playerService.Edit(playerId, model);
+
+            return Ok(playerViewModel);
+        }
+
+        [HttpDelete("{playerId}")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        public async Task<IActionResult> Delete(Guid playerId)
+        {
+            await playerService.Delete(playerId);
+
+            return Ok();
+        }
+
         [HttpGet]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
         public async Task<IActionResult> GetByTeamIdAsync([FromQuery] Guid teamId)
         {
             var players = await playerService.GetPlayersByTeamIdAsync(teamId);

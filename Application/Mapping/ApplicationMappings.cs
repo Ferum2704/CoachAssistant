@@ -48,6 +48,10 @@ namespace Application.Mapping
                 .ForMember(x => x.Position, act => act.Ignore());
             cfg.CreateMap<MatchLineupPositionPlayer,  MatchLineupPositionPlayerViewModel>()
                 .ForMember(x => x.Player, act => act.Ignore());
+            cfg.CreateMap<MatchLineupPositionPlayerModel, MatchLineupPositionPlayer>()
+                .ForMember(x => x.Id, act => act.MapFrom(x => Guid.NewGuid()))
+                .ForMember(x => x.Player, act => act.Ignore())
+                .ForMember(x => x.Score, act => act.MapFrom(x => 1));
 
             cfg.CreateMap<PositionModel, Position>();
             cfg.CreateMap<Position, PositionViewModel>()
@@ -56,6 +60,9 @@ namespace Application.Mapping
             cfg.CreateMap<Criterion, CriterionViewModel>();
             cfg.CreateMap<PositionCriteriaModel, PositionCriteria>();
             cfg.CreateMap<PositionCriteria, PositionCriteriaViewModel>();
+
+            cfg.CreateMap<ActionTypeModel, ActionType>();
+            cfg.CreateMap<ActionType, ActionTypeViewModel>();
         }
     }
 }

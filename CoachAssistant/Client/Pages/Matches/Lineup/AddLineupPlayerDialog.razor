@@ -1,0 +1,41 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudSelect T="Guid?" Label="Select player to add" @bind-Value="selectedPlayer" ToStringFunc="@((guid) => GetPlayerNameByGuid(guid))">
+            <MudSelectItem T="Guid?" Value="@((Guid?)null)" Disabled="true">Select a team</MudSelectItem>
+            @foreach (var player in AvailablePlayers)
+            {
+                <MudSelectItem T="Guid?" Value="@player.Id">@($"{player.Name} {player.Surname}")</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="@Submit">Add</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="@Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private Guid? selectedPlayer { get; set; } = null;
+
+    [Parameter]
+    public List<PlayerViewModel> AvailablePlayers { get; set; }
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    private string GetPlayerNameByGuid(Guid? guid)
+    {
+        return AvailablePlayers.FirstOrDefault(t => t.Id == guid)?.Name ?? "";
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(AvailablePlayers.First(x => x.Id == selectedPlayer));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Close();
+    }
+}

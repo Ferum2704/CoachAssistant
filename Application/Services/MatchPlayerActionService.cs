@@ -43,9 +43,18 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<MatchPlayerActionViewModel> Edit(Guid id, MatchPlayerActionModel model)
+        public async Task<MatchPlayerActionViewModel> Edit(Guid id, MatchPlayerActionModel model)
         {
-            throw new NotImplementedException();
+            var playerAction = await unitOfWork.MatchPlayerActionRepository.GetByIdAsync(id);
+
+            if (playerAction.ActionNumber != model.ActionNumber)
+            {
+                playerAction.ActionNumber = model.ActionNumber;
+                unitOfWork.MatchPlayerActionRepository.Update(playerAction);
+                await unitOfWork.SaveAsync();
+            }
+
+            return mapper.Map<MatchPlayerActionViewModel>(playerAction);
         }
 
         public Task<MatchPlayerActionViewModel> Get(Guid id)

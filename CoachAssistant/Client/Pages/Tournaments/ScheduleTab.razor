@@ -2,51 +2,57 @@
 @inject TeamService TeamService
 @inject NavigationManager NavigationManager
 
-@if (matches == null || matches.Count == 0)
-{
-    <MudButton OnClick="@GenerateSchedule">Generate Schedule</MudButton>
-}
-else
-{
-    <MudTable Items="@matches">
-        <HeaderContent>
-            <MudTh>Match</MudTh>
-            <MudTh>Location</MudTh>
-            <MudTh>Start Time</MudTh>
-            <MudTh>Details</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@string.Join(" vs ", context.MatchTeams.Select(mt => mt.Team.Name))</MudTd>
-            <MudTd>@context.Location</MudTd>
-            <MudTd>@context.StartTime.ToString("g")</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Filled.ArrowForward" OnClick="(() => NavigateToMatchDetails(context.Id))" />
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-}
+<MudContainer Class="py-4">
+    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Match Schedule</MudText>
+
+    @if (matches == null || matches.Count == 0)
+    {
+        <MudGrid Justify="Justify.Center" Class="mt-3">
+            <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="@GenerateSchedule" Size="Size.Large">Generate Schedule</MudButton>
+        </MudGrid>
+    }
+    else
+    {
+        foreach (var match in matches)
+        {
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="10" sm="10" md="10" lg="10">
+                    <MudPaper Class="m-2 p-4 d-flex flex-column align-center justify-center" Elevation="8" Style="cursor: pointer; transition: box-shadow 0.3s; border-radius: 12px; background-color:lightgray;" @onclick="@(() => NavigateToMatchDetails(match.Id))">
+                        <MudText Typo="Typo.subtitle1" Color="Color.Primary">
+                            @match.StartTime.ToString("MMMM dd, yyyy | hh:mm tt") | @match.Location
+                        </MudText>
+                        <MudText Typo="Typo.h6" Class="mt-2" Style="font-weight: 600;">
+                            @string.Join(" VS ", match.MatchTeams.Select(mt => mt.Team.Name))
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        }
+    }
+</MudContainer>
 
 @code {
-    private TournamentViewModel tournament;
     private IReadOnlyCollection<MatchViewModel> matches = new List<MatchViewModel>();
-    private List<TeamViewModel> teams = new();
+    private List<ClubViewModel> teams = new();
 
     [Parameter]
-    public TournamentViewModel Tournament
+    public TournamentViewModel Tournament { get; set; }
+
+    protected override void OnInitialized()
     {
-        get => tournament;
-        set
+        if (Tournament is not null)
         {
-            tournament = value;
-            LoadTeams();
+            matches = Tournament.Matches;
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        if (tournament is not null)
+        await LoadTeams();
+
+        if (matches.Count > 0)
         {
-            matches = tournament.Matches;
+            AssignTeamsToMatches();
         }
     }
 
@@ -54,23 +60,26 @@ else
     {
         var tournament = await TournamentService.GenerateSchedule(Tournament.Id.ToString());
 
-        foreach (var matchTeam in matches.SelectMany(x => x.MatchTeams))
-        {
-            matchTeam.Team = teams.FirstOrDefault(x => x.Id == matchTeam.TeamId);
-        }
-
         matches = tournament.Matches;
+
+        AssignTeamsToMatches();
 
         StateHasChanged();
     }
 
-    private void LoadTeams()
+    private async Task LoadTeams()
     {
         if (Tournament != null)
         {
-            var teamsIds = Tournament.TournamentTeams.Select(x => x.TeamId).Distinct().ToList();
+            teams = await TeamService.GetTournamentTeams(Tournament.Id);
+        }
+    }
 
-            teams = TeamService.GetTournamentsTeams(teamsIds);
+    private void AssignTeamsToMatches()
+    {
+        foreach (var matchTeam in matches.SelectMany(x => x.MatchTeams))
+        {
+            matchTeam.Team = teams.FirstOrDefault(x => x.Team.Id == matchTeam.TeamId)?.Team;
         }
     }
 
@@ -78,5 +87,4 @@ else
     {
         NavigationManager.NavigateTo($"/match/{matchId}");
     }
-
 }

@@ -6,6 +6,7 @@ namespace CoachAssistant.Client.Services
     public class TeamService
     {
         public List<ClubViewModel> Teams { get; private set; } = new();
+        public Dictionary<Guid, List<ClubViewModel>> TournamentsTeams { get; private set; } = new();
 
         private readonly IHttpClientService httpClientService;
 
@@ -17,11 +18,15 @@ namespace CoachAssistant.Client.Services
         public async Task LoadTeams() =>
             Teams = await httpClientService.GetAsync<List<ClubViewModel>>(ApiUrls.TeamsUrl);
 
-        public List<TeamViewModel> GetTournamentsTeams(List<Guid> teamIds)
+        public async Task<List<ClubViewModel>> GetTournamentTeams(Guid tournamentId)
         {
-            var teams = Teams.Where(x => teamIds.Contains(x.Team.Id)).Select(x => x.Team).ToList();
+            if (!TournamentsTeams.ContainsKey(tournamentId))
+            {
+                var teams = await httpClientService.GetAsync<List<ClubViewModel>>(ApiUrls.GetTournamentTeamsUrl(tournamentId));
+                TournamentsTeams[tournamentId] = teams;
+            }
 
-            return teams;
+            return TournamentsTeams[tournamentId];
         }
     }
 }

@@ -28,9 +28,12 @@ namespace Application.Services
             return mapper.Map<TournamentTeamViewModel>(tournamentTeam);
         }
 
-        public Task Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            var tournamentTeam = await unitOfWork.TournamentTeamRepository.GetByIdAsync(id);
+
+            unitOfWork.TournamentTeamRepository.Remove(tournamentTeam);
+            await unitOfWork.SaveAsync();
         }
 
         public Task DeleteBulk<TEntity>(Func<TEntity, bool> predicate)

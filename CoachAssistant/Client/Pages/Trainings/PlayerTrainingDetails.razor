@@ -1,7 +1,7 @@
 ﻿
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.h5">Estimate performance for Emily Johnson</MudText>
+        <MudText Typo="Typo.h5">@Record.Player.Name @Record.Player.Surname</MudText>
         <MudGrid Class="mt-4">
             <MudItem xs="12">
                 <MudText Typo="Typo.body1">Select a position to estimate the player:</MudText>
@@ -123,7 +123,7 @@
         var mark = allMarks.First(x => x.CriterionId == criterionId);
         if (mark != null && mark.Mark != value)
         {
-            if (mark.Mark != 0 && !updatedMarks.Any(x => x.Id == mark.Id))
+            if (mark.Mark != 0 && !updatedMarks.Any(x => x.Id == mark.Id) && mark.Id != Guid.Empty)
             {
                 updatedMarks.Add(mark);
             }

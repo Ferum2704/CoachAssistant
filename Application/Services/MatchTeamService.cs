@@ -60,11 +60,11 @@ namespace Application.Services
             {
                 matchTeam.NumberOfDefenders = model.NumberOfDefenders;
             }
-            else if (matchTeam.NumberOfMidfielders != model.NumberOfMidfielders)
+            if (matchTeam.NumberOfMidfielders != model.NumberOfMidfielders)
             {
                 matchTeam.NumberOfMidfielders = model.NumberOfMidfielders;
             }
-            else if (matchTeam.NumberOfForwards != model.NumberOfForwards)
+            if (matchTeam.NumberOfForwards != model.NumberOfForwards)
             {
                 matchTeam.NumberOfForwards = model.NumberOfForwards;
             }
@@ -75,7 +75,7 @@ namespace Application.Services
             var matchLineupPositions = await unitOfWork.MatchLineupPositionRepository.GetAsync(x => x.MatchTeamId == id);
             var positions = await GetPositionsForTactic(model.NumberOfDefenders, model.NumberOfMidfielders, model.NumberOfForwards);
 
-            foreach (var position in positions.Where(p => matchLineupPositions.Any(x => x.PositionId == p.Key.Id)))
+            foreach (var position in positions.Where(p => !matchLineupPositions.Any(x => x.PositionId == p.Key.Id)))
             {
                 for (int i = 0; i < position.Value; i++)
                 {

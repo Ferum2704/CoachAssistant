@@ -1,9 +1,8 @@
 ﻿using Application.Abstractions;
-using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
-using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared;
+using CoachAssistant.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -35,6 +34,14 @@ namespace CoachAssistant.Server.Api.Controllers
             var tournamentTeamViewModel = await tournamentTeamService.Add(model);
 
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TournamentTeamAddedNotification(tournamentTeamViewModel);
+
+            return Ok(tournamentTeamViewModel);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await tournamentTeamService.Delete(id);
 
             return Ok();
         }

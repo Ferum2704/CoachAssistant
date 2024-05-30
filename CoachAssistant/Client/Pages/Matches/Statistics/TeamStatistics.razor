@@ -1,0 +1,100 @@
+﻿@inject MatchPlayerActionService MatchPlayerActionService
+@inject ICurrentTeamProvider CurrentTeamProvider
+@inject IAccountManager AccountManager
+@inject IMapper Mapper
+
+<MudPaper Class="mt-4 pa-2" Elevation="2">
+    <MudGrid Class="mb-1">
+        <MudItem xs="12" sm="6">
+            <MudText Typo="Typo.h5" Color="Color.Primary">Players Statistics for @MatchTeam.Team.Name</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="6" Class="d-flex justify-end">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@SaveChanges" Disabled="!hasChanges">Save Changes</MudButton>
+        </MudItem>
+    </MudGrid>
+        <MudTable Items="@MatchTeam.Team.Players" Dense Bordered Striped Hover="true">
+         <HeaderContent>
+             <MudTh>Player</MudTh>
+             @foreach (var actionType in actionTypes)
+            {
+                <MudTh>@actionType.Name</MudTh>
+            }
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Player">@context.Name @context.Surname</MudTd>
+            @foreach (var actionType in actionTypes)
+            {
+                <MudTd DataLabel="@actionType.Name">
+                    <MudNumericField T="int" Value="@(context.MatchPlayerActions.FirstOrDefault(x => x.ActionTypeId == actionType.Id)?.ActionNumber ?? 0)" ReadOnly="!isManager" ValueChanged="@(value => OnActionChanged(context, actionType, value))" />
+                </MudTd>
+            }
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public MatchTeamViewModel MatchTeam { get; set; }
+
+    private List<ActionTypeViewModel> actionTypes = new();
+    private List<MatchPlayerActionViewModel> updatedPlayersActions = new();
+    private List<MatchPlayerActionViewModel> newPlayersActions = new();
+    private bool hasChanges = false;
+    private bool isManager = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        actionTypes = await MatchPlayerActionService.GetAllActionTypes();
+        isManager = await AccountManager.IsUserInRole("Manager");
+    }
+
+    private void OnActionChanged(PlayerViewModel player, ActionTypeViewModel actionType, int newValue)
+    {
+        var action = player.MatchPlayerActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id);
+        if (action == null || newPlayersActions.Any(x => x.ActionTypeId == actionType.Id))
+        {
+            var playerAction = newPlayersActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id);
+
+            if (playerAction is null)
+            {
+                var newPlayerAction = new MatchPlayerActionViewModel
+                    {
+                        PlayerId = player.Id,
+                        ActionType = actionType,
+                        ActionTypeId = actionType.Id,
+                        ActionNumber = newValue
+                    };
+                player.MatchPlayerActions.Add(newPlayerAction);
+                
+                newPlayersActions.Add(newPlayerAction);
+            }
+            else
+            {
+                playerAction.ActionNumber = newValue;
+            }
+        }
+        else
+        {
+            action.ActionNumber = newValue;
+            updatedPlayersActions.Add(action);
+        }
+        hasChanges = true;
+    }
+
+    private async Task SaveChanges()
+    {
+        foreach (var playerAction in newPlayersActions)
+        {
+            await MatchPlayerActionService.Add(Mapper.Map<MatchPlayerActionModel>(playerAction));
+        }
+
+        foreach (var playerAction in updatedPlayersActions)
+        {
+            await MatchPlayerActionService.Edit(playerAction.Id, Mapper.Map<MatchPlayerActionModel>(playerAction));
+        }
+
+        hasChanges = false;
+    }
+}
+

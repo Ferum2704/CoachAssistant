@@ -28,6 +28,7 @@ namespace Application
             services.AddScoped<IActionTypeService, ActionTypeService>();
             services.AddScoped<IMatchPlayerActionService, MatchPlayerActionService>();
             services.AddScoped<ITrainingMarkService, TrainingMarkService>();
+            services.AddScoped<IMatchLineupPositionPlayerService, MatchLineupPositionPlayerService>();
 
             services.AddScoped<ILineupCalculator, LineupCalculator>();
             services.AddScoped<ITopsisCalculator, TopsisCalculator>();

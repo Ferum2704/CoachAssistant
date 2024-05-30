@@ -6,5 +6,7 @@ namespace Application.Services.IService
     public interface IClubService : IService<TeamClubModel, ClubViewModel>
     {
         Task<ClubViewModel> GetByCoachId(Guid coachId);
+
+        Task<List<ClubViewModel>> GetByTournamentId(Guid tournamentId);
     }
 }

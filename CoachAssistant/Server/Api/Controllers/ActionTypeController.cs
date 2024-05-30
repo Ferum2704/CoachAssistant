@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CoachAssistant.Server.Api.Controllers
 {
     [Route("api/coaching-system/actionTypes")]
-    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+    [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}, {nameof(ApplicationUserRole.Manager)}")]
     [ApiController]
     public class ActionTypeController : ControllerBase
     {
@@ -30,6 +30,7 @@ namespace CoachAssistant.Server.Api.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> PostActionType(ActionTypeModel model)
         {
             var actionTypeViewModel = await actionTypeService.Add(model);

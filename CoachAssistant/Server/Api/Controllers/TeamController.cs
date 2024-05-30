@@ -3,6 +3,7 @@ using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
 using CoachAssistant.Shared.Models;
+using CoachAssistant.Shared.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -49,11 +50,19 @@ namespace CoachAssistant.Server.Api.Controllers
             return Ok(teamViewModel);
         }
 
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}, {nameof(ApplicationUserRole.Coach)}")]
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] Guid? tournamentId)
         {
-            var teams = await clubService.GetAll();
+            IReadOnlyCollection<ClubViewModel> teams;
+            if (tournamentId.HasValue)
+            {
+                teams = await clubService.GetByTournamentId(tournamentId.Value);
+            }
+            else
+            {
+                teams = await clubService.GetAll();
+            }
 
             return Ok(teams);
         }
