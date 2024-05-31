@@ -8,5 +8,11 @@ namespace Application.Services.IService
         Task<ClubViewModel> GetByCoachId(Guid coachId);
 
         Task<List<ClubViewModel>> GetByTournamentId(Guid tournamentId);
+
+        Task SendForVerification(Guid clubId);
+
+        Task AcceptVerification(Guid clubId);
+
+        Task RejectVerification(Guid clubId);
     }
 }

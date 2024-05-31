@@ -1,4 +1,5 @@
 using Application;
+using Application.Emails;
 using CoachAssistant.Server.Configurations;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Server.OptionsSetup;
@@ -18,6 +19,11 @@ builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsSetup>();
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+var emailConfig = builder.Configuration
+    .GetSection("EmailConfiguration")
+    .Get<EmailConfiguration>();
+builder.Services.AddSingleton(emailConfig);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>

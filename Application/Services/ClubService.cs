@@ -82,9 +82,37 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<ClubViewModel> Edit(Guid id, TeamClubModel model)
+        public async Task<ClubViewModel> Edit(Guid id, TeamClubModel model)
         {
-            throw new NotImplementedException();
+            var club = await unitOfWork.ClubRepository.GetByIdAsync(id);
+
+            if (club is not null)
+            {
+                if (club.Name != model.Name && model.Name is not null)
+                {
+                    club.Team.Name = model.Name;
+                    club.Name = model.Name;
+                }
+                if (club.City != model.City && model.City is not null)
+                {
+                    club.City = model.City;
+                }
+                if (club.Stadium != model.Stadium && model.Stadium is not null)
+                {
+                    club.Stadium = model.Stadium;
+                }
+                if (club.Region != model.Region && model.Region is not null)
+                {
+                    club.Region = model.Region;
+                }
+
+                unitOfWork.ClubRepository.Update(club);
+                unitOfWork.TeamRepository.Update(club.Team);
+
+                await unitOfWork.SaveAsync();
+            }
+
+            return mapper.Map<ClubViewModel>(club);
         }
 
         public async Task<ClubViewModel> Get(Guid id)
@@ -129,6 +157,36 @@ namespace Application.Services
             var clubs = await unitOfWork.ClubRepository.GetAsync(x => teams.Select(t => t.ClubId).Contains(x.Id));
 
             return mapper.Map<List<ClubViewModel>>(clubs);
+        }
+
+        public async Task AcceptVerification(Guid clubId)
+        {
+            var club = await unitOfWork.ClubRepository.GetByIdAsync(clubId);
+
+            club.Team.VerificationState = VerificationState.Verified;
+
+            unitOfWork.TeamRepository.Update(club.Team);
+            await unitOfWork.SaveAsync();
+        }
+
+        public async Task RejectVerification(Guid clubId)
+        {
+            var club = await unitOfWork.ClubRepository.GetByIdAsync(clubId);
+
+            club.Team.VerificationState = VerificationState.NotVerified;
+
+            unitOfWork.TeamRepository.Update(club.Team);
+            await unitOfWork.SaveAsync();
+        }
+
+        public async Task SendForVerification(Guid clubId)
+        {
+            var club = await unitOfWork.ClubRepository.GetByIdAsync(clubId);
+
+            club.Team.VerificationState = VerificationState.InProgress;
+
+            unitOfWork.TeamRepository.Update(club.Team);
+            await unitOfWork.SaveAsync();
         }
     }
 }

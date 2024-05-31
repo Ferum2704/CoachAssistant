@@ -1,0 +1,70 @@
+﻿@page "/teams"
+@inject TeamService TeamService
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">Teams list</MudText>
+    <MudTable Items="clubs" Striped="true">
+        <HeaderContent>
+            <MudTh Style="width: 20%">Name</MudTh>
+            <MudTh Style="width: 20%">Region</MudTh>
+            <MudTh Style="width: 20%">City</MudTh>
+            <MudTh Style="width: 20%">Stadium</MudTh>
+            <MudTh Style="width: 10%">Verification State</MudTh>
+            <MudTh Style="width: 10%"></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd Style="font-weight: bold">@context.Name</MudTd>
+            <MudTd>@context.Region</MudTd>
+            <MudTd>@context.City</MudTd>
+            <MudTd>@context.Stadium</MudTd>
+            <MudTd>
+                <MudChip Color="@GetStateColor(context.Team.VerificationState)" Text="@GetStateText(context.Team.VerificationState)" />
+            </MudTd>
+            <MudTd>
+                <MudButton Color="Color.Error" OnClick="@(() => RejectTeam(context))" Disabled="@(context.Team.VerificationState != VerificationState.InProgress)">Reject team</MudButton>
+                <MudButton Color="Color.Success" OnClick="@(() => AcceptTeam(context))" Disabled="@(context.Team.VerificationState != VerificationState.InProgress)">Accept team</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+    @code {
+    private List<ClubViewModel> clubs = new();
+
+    protected override void OnInitialized()
+    {
+        clubs = TeamService.Teams;
+    }
+
+    private Color GetStateColor(VerificationState state) => state switch
+    {
+        VerificationState.NotVerified => Color.Error,
+        VerificationState.InProgress => Color.Warning,
+        VerificationState.Verified => Color.Success,
+        _ => Color.Default
+    };
+
+    private string GetStateText(VerificationState state) => state switch
+    {
+        VerificationState.NotVerified => "Not Verified",
+        VerificationState.InProgress => "In Progress",
+        VerificationState.Verified => "Verified",
+        _ => "Unknown"
+    };
+
+    private async Task AcceptTeam(ClubViewModel club)
+    {
+        await TeamService.AcceptVerification(club.Id);
+
+        club.Team.VerificationState = VerificationState.Verified;
+        StateHasChanged();
+    }
+
+    private async Task RejectTeam(ClubViewModel club)
+    {
+        await TeamService.RejectVerification(club.Id);
+
+        club.Team.VerificationState = VerificationState.NotVerified;
+        StateHasChanged();
+    }
+}

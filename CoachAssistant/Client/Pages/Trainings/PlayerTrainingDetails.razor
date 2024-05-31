@@ -2,6 +2,13 @@
 <MudDialog>
     <DialogContent>
         <MudText Typo="Typo.h5">@Record.Player.Name @Record.Player.Surname</MudText>
+        <EditForm Model="@Record">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Training note" @bind-Value="Record.Note" FullWidth Lines="5" />
+                </MudItem>
+            </MudGrid>
+         </EditForm>
         <MudGrid Class="mt-4">
             <MudItem xs="12">
                 <MudText Typo="Typo.body1">Select a position to estimate the player:</MudText>
@@ -29,9 +36,9 @@
                 {
                     <MudItem xs="12" Class="mt-2">
                         <MudText Typo="Typo.subtitle1">@mark.Criterion.Name</MudText>
-                            <MudSlider Min="0" Max="10" Step="1" Value="@mark.Mark" ValueChanged="@((float value) => SetCriterionValue(mark.CriterionId, value))" Color="Color.Primary" />
-                            <MudText>@mark.Mark</MudText>
-                        </MudItem>
+                        <MudSlider Min="0" Max="10" Step="1" Value="@mark.Mark" ValueChanged="@((float value) => SetCriterionValue(mark.CriterionId, value))" Color="Color.Primary" />
+                        <MudText>@mark.Mark</MudText>
+                    </MudItem>
                 }
             }
         </MudGrid>
@@ -153,7 +160,7 @@
             }
         }
 
-        MudDialog.Close();
+        MudDialog.Close(Record);
     }
 
     private void CloseDialog()

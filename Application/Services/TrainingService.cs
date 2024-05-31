@@ -63,15 +63,15 @@ namespace Application.Services
                 {
                     training.Name = model.Name;
                 }
-                else if (training.Description != model.Description)
+                if (training.Description != model.Description)
                 {
                     training.Description = model.Description;
                 }
-                else if (training.StartDate != model.StartDate)
+                if (training.StartDate != model.StartDate)
                 {
                     training.StartDate = model.StartDate;
                 }
-                else if (training.Duration != model.Duration)
+                if (training.Duration != model.Duration)
                 {
                     training.Duration = model.Duration;
                 }

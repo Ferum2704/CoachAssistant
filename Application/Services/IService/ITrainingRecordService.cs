@@ -5,5 +5,6 @@ namespace Application.Services.IService
 {
     public interface ITrainingRecordService : IService<TrainingRecordModel, TrainingRecordViewModel>
     {
+        Task SendRecordByEmail(Guid recordId);
     }
 }

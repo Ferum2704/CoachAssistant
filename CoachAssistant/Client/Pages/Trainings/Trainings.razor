@@ -5,9 +5,9 @@
 @inject IMapper Mapper;
 @inject NavigationManager NavigationManager
 
-<MudGrid>
-    <MudItem xs="12" Style="text-align: right;">
-        <MudButton Color="Color.Primary" OnClick="AddTraining">Add Training</MudButton>
+<MudGrid Class="pa-4">
+    <MudItem xs="12" Class="d-flex justify-end">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddTraining">Add Training</MudButton>
     </MudItem>
     <MudItem xs="12" Class="my-4" Style="text-align: center;">
         <MudDatePicker @bind-Date="SelectedDate" PickerVariant="PickerVariant.Dialog" Variant="Variant.Filled"
@@ -27,8 +27,8 @@
                                 <MudText Style="color: gray;">@training.Description</MudText>
                             </MudItem>
                             <MudItem xs="3" Style="text-align: right;">
-                                <MudButton OnClick="() => EditTraining(training)" Color="Color.Primary" Variant="Variant.Filled" Style="margin-right: 10px;">Edit</MudButton>
-                                <MudButton OnClick="() => ConfirmRemoveTraining(training)" Color="Color.Error" Variant="Variant.Filled">Remove</MudButton>
+                                    <MudButton OnClick="() => EditTraining(training)" StartIcon="@Icons.Filled.Edit" Color="Color.Secondary" Style="margin-right: 10px;">Edit</MudButton>
+                                    <MudButton OnClick="() => ConfirmRemoveTraining(training)" StartIcon="@Icons.Filled.Delete" Color="Color.Error">Remove</MudButton>
                                 <MudIconButton OnClick="() => NavigateToTraining(training.Id)" Icon="@Icons.Filled.ArrowForward"/> 
                             </MudItem>
                         </MudGrid>

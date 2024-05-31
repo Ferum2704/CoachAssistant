@@ -70,7 +70,11 @@
 
     private async Task AddTeam()
     {
-        var availableTeams = TeamService.Teams.Where(x => !clubs.Select(x => x.Team.Id).Contains(x.Team.Id)).Select(x => x.Team).ToList();
+        var availableTeams = TeamService.Teams
+            .Where(x => !clubs.Select(x => x.Team.Id).Contains(x.Team.Id))
+            .Select(x => x.Team)
+            .Where(x => x.VerificationState == VerificationState.Verified)
+            .ToList();
         var parameters = new DialogParameters<SelectTeamsDialog>();
         parameters.Add(x => x.AvailableTeams, availableTeams);
 

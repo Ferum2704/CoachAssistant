@@ -1,5 +1,6 @@
 ﻿
 using System.Net.Http.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CoachAssistant.Client.Network
 {
@@ -76,5 +77,7 @@ namespace CoachAssistant.Client.Network
                 return default;
             }
         }
+
+        public async Task PutAsync(string url) => await _httpClient.PutAsync(url, null);
     }
 }

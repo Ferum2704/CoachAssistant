@@ -38,6 +38,8 @@
 
         public static string ActionTypesUrl => $"{BaseUrl}/actionTypes";
 
+        public static string TrainingRecordsUrl => $"{BaseUrl}/trainingRecords";
+
         public static string GetPlayersUrl(Guid teamId) => string.Format(PlayersUrl, teamId);
 
         public static string GetPlayerByIdUrl(Guid teamId, Guid playerId) => $"{string.Format(PlayersUrl, teamId)}/{playerId}";
@@ -73,5 +75,15 @@
         public static string GetMatchPlayerActionByIdUrl(Guid playerActionId) => $"{MatchPlayerActionsUrl}/{playerActionId}";
 
         public static string GetPlayersByTeamIdUrl(Guid teamId) => $"{PlayersUrl}?teamId={teamId}";
+
+        public static string GetTeamByIdUrl(Guid clubId) => $"{TeamsUrl}/{clubId}";
+
+        public static string GetSendTeamForVerificationUrl(Guid clubId) => $"{GetTeamByIdUrl(clubId)}/verification/send";
+
+        public static string GetAcceptTeamVerificationUrl(Guid clubId) => $"{GetTeamByIdUrl(clubId)}/verification/accept";
+
+        public static string GetRejectTeamVerificationUrl(Guid clubId) => $"{GetTeamByIdUrl(clubId)}/verification/reject";
+
+        public static string GetTrainingRecordByIdUrl(Guid recordId) => $"{TrainingRecordsUrl}/{recordId}";
     }
 }

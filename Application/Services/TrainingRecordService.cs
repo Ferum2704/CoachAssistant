@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Emails;
 using Application.Services.IService;
 using AutoMapper;
 using CoachAssistant.Shared.Models;
@@ -10,11 +11,13 @@ namespace Application.Services
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
+        private readonly IEmailSender emailSender;
 
-        public TrainingRecordService(IMapper mapper, IUnitOfWork unitOfWork)
+        public TrainingRecordService(IMapper mapper, IUnitOfWork unitOfWork, IEmailSender emailSender)
         {
             this.mapper = mapper;
             this.unitOfWork = unitOfWork;
+            this.emailSender = emailSender;
         }
 
         public Task<TrainingRecordViewModel> Add(TrainingRecordModel model)
@@ -48,7 +51,7 @@ namespace Application.Services
                 {
                     trainingRecord.Note = model.Note;
                 }
-                else if (model.IsPresent.HasValue && trainingRecord.IsPresent != model.IsPresent)
+                if (model.IsPresent.HasValue && trainingRecord.IsPresent != model.IsPresent)
                 {
                     trainingRecord.IsPresent = model.IsPresent.Value;
                 }
@@ -68,6 +71,11 @@ namespace Application.Services
         }
 
         public Task<IReadOnlyCollection<TrainingRecordViewModel>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendRecordByEmail(Guid recordId)
         {
             throw new NotImplementedException();
         }

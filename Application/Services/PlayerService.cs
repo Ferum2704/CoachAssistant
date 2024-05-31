@@ -80,23 +80,23 @@ namespace Application.Services
             {
                 player.Name = model.Name;
             }
-            else if(player.Surname != model.Surname)
+            if(player.Surname != model.Surname)
             {
                 player.Surname = model.Surname;
             }
-            else if (player.Weight != model.Weight)
+            if (player.Weight != model.Weight)
             {
                 player.Weight = model.Weight;
             }
-            else if (player.Height != model.Height)
+            if (player.Height != model.Height)
             {
                 player.Height = model.Height;
             }
-            else if (player.Email != model.Email)
+            if (player.Email != model.Email)
             {
                 player.Email = model.Email;
             }
-            else if (player.PhotoPath != model.PhotoPath)
+            if (player.PhotoPath != model.PhotoPath)
             {
                 player.Email = model.Email;
             }

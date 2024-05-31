@@ -2,6 +2,7 @@
 @inject ICurrentTeamProvider CurrentTeamProvider
 @inject NavigationManager NavigationManager
 @inject TrainingService TrainingService
+@inject TrainingRecordService TrainingRecordService
 @inject IDialogService DialogService
 
 <MudPaper Class="pa-4">
@@ -46,8 +47,13 @@
         await LoadTraining();
     }
 
-    private void CheckPresence(TrainingRecordViewModel record)
+    private async Task CheckPresence(TrainingRecordViewModel record)
     {
+        await TrainingRecordService.Edit(record.Id, new TrainingRecordModel
+        {
+            IsPresent = !record.IsPresent,
+        });
+
         record.IsPresent = !record.IsPresent;
     }
 
@@ -60,7 +66,15 @@
             $"{record.Player.Name} {record.Player.Surname}",
             parameters,
             new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium });
-        var result = await dialog.Result;
+        var result = (await dialog.Result).Data as TrainingRecordViewModel;
+
+        if (result != null)
+        {
+            var updatedRecord = await TrainingRecordService.Edit(record.Id, new TrainingRecordModel
+                {
+                    Note = result.Note is null ? "" : result.Note,
+                });
+        }
 
         await LoadTraining();
     }

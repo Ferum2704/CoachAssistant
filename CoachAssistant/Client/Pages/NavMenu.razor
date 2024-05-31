@@ -10,6 +10,10 @@
             <MudNavLink Href="/positions" Match="NavLinkMatch.Prefix">Positions</MudNavLink>
         </MudNavGroup>
     }
+    @if (isManager)
+    {
+        <MudNavLink Href="/teams" Match="NavLinkMatch.Prefix">Teams</MudNavLink>
+    }
     @if (isManager || isCoach)
     {
         <MudNavGroup Title="Tournaments" Expanded="true">

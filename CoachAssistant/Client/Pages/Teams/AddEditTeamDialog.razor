@@ -1,0 +1,34 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@Club">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="Name" @bind-Value="Club.Name" />
+                    <MudTextField Label="City" @bind-Value="Club.City" />
+                    <MudTextField Label="Region" @bind-Value="Club.Region" />
+                    <MudTextField Label="Stadium" @bind-Value="Club.Stadium" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public ClubViewModel Club { get; set; } = new();
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private void Save()
+    {
+        MudDialog.Close(Club);
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Close();
+    }
+}

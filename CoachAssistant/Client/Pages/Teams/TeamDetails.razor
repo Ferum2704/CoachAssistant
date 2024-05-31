@@ -1,0 +1,145 @@
+﻿@using CoachAssistant.Client.Entities
+@page "/teamDetails"
+
+@if (club is null)
+{
+    <MudPaper Class="d-flex flex-column align-center justify-center" MaxWidth="100vw" Height="100vh">
+        <MudIcon Icon="@Icons.Material.Filled.Error" Style="font-size: 150px; color: red"/>
+        <MudText Typo="Typo.h3">You don't have a team yet.</MudText>
+        <MudButton Class="mt-4" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" OnClick="AddTeam">
+            Add team
+        </MudButton>
+    </MudPaper>
+}
+else
+{
+    <MudPaper Elevation="2" Class="p-4 m-2">
+        <MudGrid>
+            <MudItem xs="12" Class="d-flex justify-start align-center">
+                <MudText Typo="Typo.h4" Color="Color.Primary">@club.Name</MudText>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="EditTeam" Color="Color.Secondary" Size="Size.Small" />
+                </MudItem>
+                <MudItem xs="12" Class="py-1">
+                    <MudText Typo="Typo.subtitle1">@club.Region, @club.City</MudText>
+                    <MudText Typo="Typo.subtitle2">@club.Stadium</MudText>
+                </MudItem>
+                <MudItem xs="12" Class="d-flex align-center">
+                    <MudIcon Icon="@verificationIcon" Style="@verificationIconStyle" Class="mr-2" />
+                    <MudText Style="@verificationTextStyle">@verificationText</MudText>
+                    @if (club.Team.VerificationState == VerificationState.NotVerified)
+                    {
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Warning" Class="ml-1" OnClick="SendForVerification">Send on verification</MudButton>
+                    }
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteTeam">Delete</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+}
+
+@inject IHttpClientService HttpClientService
+@inject ICurrentTeamProvider CurrentTeamProvider
+@inject TeamService TeamService
+@inject IDialogService DialogService
+@inject IMapper Mapper;
+
+@code {
+    private ClubViewModel club;
+    private bool isEditMode;
+
+    private string verificationIcon;
+    private string verificationIconStyle;
+    private string verificationText;
+    private string verificationTextStyle;
+
+    protected override void OnParametersSet()
+    {
+        verificationIcon = GetVerificationIcon(club.Team.VerificationState);
+        verificationIconStyle = $"color: {GetVerificationColor(club.Team.VerificationState)}";
+        verificationText = GetVerificationText(club.Team.VerificationState);
+        verificationTextStyle = $"color: {GetVerificationColor(club.Team.VerificationState)}";
+    }
+
+    string GetVerificationIcon(VerificationState state) => state switch
+    {
+        VerificationState.NotVerified => Icons.Material.Filled.Close,
+        VerificationState.InProgress => Icons.Material.Filled.HourglassEmpty,
+        VerificationState.Verified => Icons.Material.Filled.Check,
+        _ => Icons.Material.Filled.Error
+    };
+
+    string GetVerificationColor(VerificationState state) => state switch
+    {
+        VerificationState.NotVerified => "red",
+        VerificationState.InProgress => "orange",
+        VerificationState.Verified => "green",
+        _ => "gray"
+    };
+
+    string GetVerificationText(VerificationState state) => state switch
+    {
+        VerificationState.NotVerified => "Not Verified",
+        VerificationState.InProgress => "Verification In Progress",
+        VerificationState.Verified => "Verified",
+        _ => "Unknown Status"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var clubViewModel = await HttpClientService.GetAsync<ClubViewModel>(ApiUrls.CoachTeamUrl);
+
+        if (clubViewModel is not null)
+        {
+            CurrentTeamProvider.CurrentClub = clubViewModel;
+
+            club = CurrentTeamProvider.CurrentClub;
+        }
+    }
+
+    private async Task AddTeam()
+    {
+        isEditMode = false;
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var parameters = new DialogParameters<AddEditTeamDialog>();
+        parameters.Add(x => x.Club, club);
+
+        var dialog = DialogService.Show<AddEditTeamDialog>(isEditMode ? "Edit Team" : "Add Team", parameters, options);
+        var result = (await dialog.Result).Data as ClubViewModel;
+
+        if (result is not null)
+        {
+            club = await TeamService.Add(Mapper.Map<TeamClubModel>(result));
+        }
+    }
+
+    private async Task EditTeam()
+    {
+        isEditMode = true;
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var parameters = new DialogParameters<AddEditTeamDialog>();
+        parameters.Add(x => x.Club, club);
+
+        var dialog = DialogService.Show<AddEditTeamDialog>(isEditMode ? "Edit Team" : "Add Team", parameters, options);
+        var result = (await dialog.Result).Data as ClubViewModel;
+
+        if (result is not null)
+        {
+            club = await TeamService.Edit(club.Id, Mapper.Map<TeamClubModel>(result));
+        }
+    }
+
+    private async Task SendForVerification()
+    {
+        await TeamService.SendTeamForVerification(club.Id);
+        club.Team.VerificationState = VerificationState.InProgress;
+        OnParametersSet();
+    }
+
+    private async Task DeleteTeam()
+    {
+        await TeamService.Delete(club.Id);
+
+        CurrentTeamProvider.CurrentClub = null;
+    }
+}

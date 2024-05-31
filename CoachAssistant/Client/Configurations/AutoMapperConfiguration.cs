@@ -25,6 +25,7 @@ namespace CoachAssistant.Client.Configurations
             cfg.CreateMap<TrainingViewModel, TrainingModel>();
             cfg.CreateMap<TrainingMarkViewModel, TrainingMarkModel>();
             cfg.CreateMap<PlayerViewModel, PlayerModel>();
+            cfg.CreateMap<ClubViewModel, TeamClubModel>();
             cfg.CreateMap<MatchPlayerActionViewModel, MatchPlayerActionModel>();
         }
     }

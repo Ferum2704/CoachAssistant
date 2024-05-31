@@ -33,7 +33,16 @@ namespace CoachAssistant.Server.Api.Controllers
 
             await hubContext.Clients.User(currentUserService.CurrentUserId.ToString()).TeamAddedNotification(clubViewModel);
 
-            return Ok();
+            return Ok(clubViewModel);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [HttpPut("{clubId}")]
+        public async Task<IActionResult> Put(Guid clubId, TeamClubModel model)
+        {
+            var clubViewModel = await clubService.Edit(clubId, model);
+
+            return Ok(clubViewModel);
         }
 
         [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
@@ -72,6 +81,33 @@ namespace CoachAssistant.Server.Api.Controllers
         public async Task<IActionResult> DeleteClub(Guid clubId)
         {
             await clubService.Delete(clubId);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        [HttpPut("{clubId}/verification/send")]
+        public async Task<IActionResult> SendForVerification(Guid clubId)
+        {
+            await clubService.SendForVerification(clubId);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpPut("{clubId}/verification/accept")]
+        public async Task<IActionResult> AcceptVerification(Guid clubId)
+        {
+            await clubService.AcceptVerification(clubId);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpPut("{clubId}/verification/reject")]
+        public async Task<IActionResult> RejectVerification(Guid clubId)
+        {
+            await clubService.RejectVerification(clubId);
 
             return Ok();
         }

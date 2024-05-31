@@ -4,7 +4,7 @@
         <EditForm Model="@Training">
             <MudGrid>
                 <MudItem xs="12">
-                    <MudTextField T="string" Label="Name" @bind-Value="Training.Name" FullWidth />
+                     <MudTextField T="string" Label="Name" @bind-Value="Training.Name" FullWidth />
                      <MudTextField T="string" Label="Description" @bind-Value="Training.Description" FullWidth Lines="5" />
                      <MudDatePicker Label="Start Date" @bind-Date="Training.StartDate" PickerVariant="PickerVariant.Dialog" />
                      <MudTextField T="float" Label="Duration (hours)" @bind-Value="Training.Duration" FullWidth />

@@ -41,6 +41,7 @@ builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<TournamentTeamService>();
 builder.Services.AddScoped<MatchLineupPositionPlayerService>();
 builder.Services.AddScoped<MatchPlayerActionService>();
+builder.Services.AddScoped<TrainingRecordService>();
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();
