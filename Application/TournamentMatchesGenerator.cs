@@ -8,9 +8,8 @@ public class TournamentMatchesGenerator : ITournamentMatchesGenerator
 {
     private readonly IUnitOfWork unitOfWork;
 
-    private IReadOnlyList<Team> teams;
-    private List<Match> matches = new();
-    private int daysCount = 0;
+    // Dictionary to track the last match date for each team
+    private Dictionary<Guid, DateTime> _teamLastMatchDates = new Dictionary<Guid, DateTime>();
 
     public TournamentMatchesGenerator(IUnitOfWork unitOfWork)
     {
@@ -19,89 +18,80 @@ public class TournamentMatchesGenerator : ITournamentMatchesGenerator
 
     public async Task Generate(Guid tournamentId)
     {
-        teams = (await unitOfWork.TournamentTeamRepository.GetAsync(x => x.TournamentId == tournamentId)).Select(x => x.Team).ToList();
-        var teamCount = teams.Count;
+        var teams = (await unitOfWork.TournamentTeamRepository.GetAsync(x => x.TournamentId == tournamentId)).Select(x => x.Team).ToList();
 
-        for (int round = 0; round < teamCount - 1; round++)
+        var matches = new List<Match>();
+
+        foreach (var homeTeam in teams)
         {
-            List<int> teamsPlayingToday = new List<int>();
-
-            for (int i = 0; i < teamCount / 2; i++)
+            foreach (var awayTeam in teams.Where(t => t.Id != homeTeam.Id))
             {
-                int homeTeamIndex = (round + i) % teamCount;
-                int awayTeamIndex = (round - i + teamCount) % teamCount;
-
-                if (i == 0) awayTeamIndex = teamCount - 1;
-
-                if (teamsPlayingToday.Contains(homeTeamIndex) || teamsPlayingToday.Contains(awayTeamIndex))
-                {
-                    daysCount++;
-                    teamsPlayingToday.Clear();
-                }
-
-                var homeTeam = teams[homeTeamIndex];
-                var awayTeam = teams[awayTeamIndex];
-                await InitializeMatch(tournamentId, homeTeam, awayTeam);
-
-                teamsPlayingToday.Add(homeTeamIndex);
-                teamsPlayingToday.Add(awayTeamIndex);
+                matches.Add(CreateMatch(homeTeam, awayTeam, tournamentId, MatchTeamType.Home, MatchTeamType.Away));
             }
-
-            daysCount++;
         }
 
-        int halfScheduleCount = matches.Count;
-
-        for (int i = 0; i < halfScheduleCount; i++)
+        // Save matches ensuring no team plays twice in one day
+        foreach (var match in matches)
         {
-            Match original = matches[i];
-
-            await InitializeMatch(
-                tournamentId, 
-                original.MatchTeams.First(x => x.TeamType == MatchTeamType.Away).Team, 
-                original.MatchTeams.First(x => x.TeamType == MatchTeamType.Home).Team);
+            AdjustMatchDate(match);
+            unitOfWork.MatchRepository.Add(match);
+            await unitOfWork.SaveAsync();
         }
     }
 
-    private async Task InitializeMatch(Guid tournamentId, Team homeTeam, Team awayTeam)
+    private Match CreateMatch(Team homeTeam, Team awayTeam, Guid tournamentId, MatchTeamType homeTeamType, MatchTeamType awayTeamType)
     {
-        var homeClub = await unitOfWork.ClubRepository.GetByIdAsync(homeTeam.ClubId);
-
-        var match = new Match()
+        var match = new Match
         {
             Id = Guid.NewGuid(),
-            StartTime = DateTime.Now.AddDays(daysCount + 1),
-            Location = homeClub.Stadium,
-            TournamentId = tournamentId
+            TournamentId = tournamentId,
+            Location = homeTeam.Club.Stadium,
+            MatchTeams = new List<MatchTeam>()
         };
-        matches.Add(match);
 
-        unitOfWork.MatchRepository.Add(match);
-        await unitOfWork.SaveAsync();
-
-        var homeMatchTeam = new MatchTeam()
+        match.MatchTeams.Add(new MatchTeam
         {
             Id = Guid.NewGuid(),
-            TeamType = MatchTeamType.Home,
+            MatchId = match.Id,
             TeamId = homeTeam.Id,
-            Team = homeTeam,
-            MatchId = match.Id
-        };
-        
+            TeamType = homeTeamType
+        });
 
-        var awayMatchTeam = new MatchTeam()
+        match.MatchTeams.Add(new MatchTeam
         {
             Id = Guid.NewGuid(),
-            TeamType = MatchTeamType.Away,
+            MatchId = match.Id,
             TeamId = awayTeam.Id,
-            Team = awayTeam,
-            MatchId = match.Id
-        };
+            TeamType = awayTeamType
+        });
 
-        var matchTeams = new List<MatchTeam>(){ homeMatchTeam, awayMatchTeam };
-        match.MatchTeams = matchTeams;
+        return match;
+    }
 
-        unitOfWork.MatchTeamRepository.AddRange(new[] { homeMatchTeam, awayMatchTeam });
-        await unitOfWork.SaveAsync();
+    // Adjusts the match start time to ensure no team plays more than once per day
+    private void AdjustMatchDate(Match match)
+    {
+        DateTime earliestDate = DateTime.Now.AddDays(1); // Start from tomorrow
+
+        foreach (var matchTeam in match.MatchTeams)
+        {
+            if (_teamLastMatchDates.TryGetValue(matchTeam.TeamId, out DateTime lastDate))
+            {
+                DateTime nextAvailableDate = lastDate.AddDays(1);
+                if (nextAvailableDate > earliestDate)
+                {
+                    earliestDate = nextAvailableDate;
+                }
+            }
+        }
+
+        // Set the match start time to the determined earliest date
+        match.StartTime = earliestDate;
+
+        // Update last match dates for both teams
+        foreach (var matchTeam in match.MatchTeams)
+        {
+            _teamLastMatchDates[matchTeam.TeamId] = earliestDate;
+        }
     }
 }

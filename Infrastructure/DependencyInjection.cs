@@ -1,5 +1,7 @@
 ﻿using Application.Abstractions;
+using Application.Emails;
 using Domain.Entities;
+using Infrastructure.Emails;
 using Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +41,7 @@ namespace Infrastructure
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICurrentUserService, CurrentUserService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IEmailSender, EmailSender>();
 
             return services;
         }

@@ -12,12 +12,12 @@
         <MudText>@training.StartDate.Value.ToString("g") - @training.StartDate.Value.AddHours(training.Duration).ToString("g")</MudText>
         <MudText GutterBottom="true">@training.Description</MudText>
 
-        <MudText Typo="Typo.h5" Class="mt-4 mb-2">Training records</MudText>
+        <MudText Typo="Typo.h5" Class="mt-4 mb-2">Записи гравців на тренуванні</MudText>
         <MudTable Items="@training.TrainingRecords" Dense>
              <HeaderContent>
-                <MudTh Style="width: 70%;">Player name</MudTh>
-                <MudTh>Presence</MudTh>
-                <MudTh>Actions</MudTh>
+                <MudTh Style="width: 50%;">Ім'я гравця'</MudTh>
+                <MudTh>Присутність</MudTh>
+                <MudTh>Дії</MudTh>
              </HeaderContent>
             <RowTemplate>
                 <MudTd>@($"{context.Player.Name} {context.Player.Surname}")</MudTd>
@@ -27,8 +27,9 @@
                             Size="Size.Large" />
                 </MudTd>
                 <MudTd>
-                    <MudButton OnClick="@(() => CheckPresence(context))" Color="Color.Primary">Check Presence</MudButton>
-                    <MudButton OnClick="@(() => ViewDetails(context))" Color="Color.Secondary">View Details</MudButton>
+                    <MudButton OnClick="@(() => CheckPresence(context))" Color="Color.Primary">Позначити присутність</MudButton>
+                    <MudButton OnClick="@(() => ViewDetails(context))" Color="Color.Secondary">Деталі</MudButton>
+                    <MudButton OnClick="@(() => SendByEmail(context))" Color="Color.Success" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send">Відправити звіт гравцю</MudButton>
                 </MudTd>
             </RowTemplate>
         </MudTable>
@@ -88,4 +89,6 @@
             record.Player = currentTeam.Players.FirstOrDefault(p => p.Id == record.PlayerId);
         }
     }
+
+    private async Task SendByEmail(TrainingRecordViewModel record) => await TrainingRecordService.SendRecordByEmail(record.Id);
 }

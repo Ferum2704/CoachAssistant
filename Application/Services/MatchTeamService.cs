@@ -114,8 +114,8 @@ namespace Application.Services
 
             if (numberOfDefenders == 4 && numberOfMidfielders == 3 && numberOfForwards == 3)
             {
-                positionNames = new string[] { "Goalkeeper", "Center-back", "Center-back", "Right back", "Left back", 
-                    "Defensive midfielder", "Center midfielder", "Center midfielder", "Right Winger", "Left Winger", "Center Forward" };
+                positionNames = new string[] { "Воротар", "Центральний захисник", "Центральний захисник", "Правий захисник", "Лівий захисник",
+                    "Опорний півзахисник", "Центральний півзахисник", "Центральний півзахисник", "Правий вінгер", "Лівий вінгер", "Центральний нападник" };
 
                 var positions = await unitOfWork.PositionRepository.GetAsync(x => positionNames.Contains(x.Name));
 

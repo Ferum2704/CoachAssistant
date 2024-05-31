@@ -13,7 +13,7 @@
         <MudItem xs="12">
             @if (isTeamCoach)
             {
-                <MudSelect T="string" Label="Select Formation" Value="@SelectedFormation" ValueChanged="OnFormationChangedAsync">
+                <MudSelect T="string" Label="Виберіть тактичну схему" Value="@SelectedFormation" ValueChanged="OnFormationChangedAsync">
                     <MudSelectItem Value=@("4-4-2")>4-4-2</MudSelectItem>
                     <MudSelectItem Value=@("4-3-3")>4-3-3</MudSelectItem>
                 </MudSelect>
@@ -24,7 +24,7 @@
             <MudItem xs="12" sm="6" md="4" Style="margin-bottom: 15px;">
                 <MudCard Outlined="true" Elevation="1" Style="border: 1px solid #dee2e6;">
                     <MudCardContent>
-                        <MudText Typo="Typo.h6" Style="font-size: 1.25rem; font-weight: 500;">@lineupPosition.Position.Name</MudText>
+                        <MudText Typo="Typo.h6" Style="font-size: 1.25rem; font-weight: 500;">@lineupPosition.Position?.Name</MudText>
                             @if (lineupPosition.MatchLineupPositionPlayers.Any())
                         {
                             <MudList>
@@ -41,12 +41,12 @@
 
                             @if (isTeamCoach)
                             {
-                                <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="@(() => RemovePlayers(lineupPosition))">Remove Players</MudButton>
+                                <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="@(() => RemovePlayers(lineupPosition))">Видалити гравців</MudButton>
                             }
                         }
                         else if(isTeamCoach)
                         {
-                            <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => AddPlayer(lineupPosition))">Add Player</MudButton>
+                            <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Secondary" OnClick="@(() => AddPlayer(lineupPosition))">Додати гравця</MudButton>
                         }
                     </MudCardContent>
                 </MudCard>
@@ -66,7 +66,6 @@
 
     private MatchTeamViewModel team;
     private bool isTeamCoach;
-    private bool isManager;
 
     [Parameter]
     public MatchTeamViewModel Team
@@ -75,7 +74,6 @@
         set
         {
             team = value;
-            LoadPlayersAndPositions();
         }
     }
 
@@ -90,6 +88,10 @@
             {
                 isTeamCoach = Team.Team.CoachId == new Guid(user.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             }
+
+            var team = await MatchTeamService.GetById(Team.Id);
+
+            LoadPlayersAndPositions();
         }
     }
 
@@ -135,7 +137,10 @@
 
                 foreach (var positionPlayer in lineupPosition.MatchLineupPositionPlayers)
                 {
-                    positionPlayer.Player = Team?.Team?.Players?.First(x => x.Id == positionPlayer.PlayerId);
+                    if (Team?.Team?.Players?.Any() ?? false)
+                    {
+                        positionPlayer.Player = Team.Team.Players.First(x => x.Id == positionPlayer.PlayerId);
+                    }
                 }
             }
         }
@@ -143,8 +148,9 @@
 
     private async Task CalculateLineup()
     {
-        await MatchTeamService.CalculateLineup(Team.Id);
-        Team = await MatchTeamService.GetById(Team.Id);
+        var matchTeam = await MatchTeamService.CalculateLineup(Team.Id);
+        Team.LineupPositions = matchTeam.LineupPositions;
+        LoadPlayersAndPositions();
     }
 
     private async Task AddPlayer(MatchLineupPositionViewModel position)

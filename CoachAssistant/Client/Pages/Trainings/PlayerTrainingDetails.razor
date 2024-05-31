@@ -1,19 +1,20 @@
-﻿
+﻿@inject MatchPlayerActionService MatchPlayerActionService
+
 <MudDialog>
     <DialogContent>
         <MudText Typo="Typo.h5">@Record.Player.Name @Record.Player.Surname</MudText>
         <EditForm Model="@Record">
             <MudGrid>
                 <MudItem xs="12">
-                    <MudTextField T="string" Label="Training note" @bind-Value="Record.Note" FullWidth Lines="5" />
+                    <MudTextField T="string" Label="Відгук по тренуванню" @bind-Value="Record.Note" FullWidth Lines="5" />
                 </MudItem>
             </MudGrid>
          </EditForm>
         <MudGrid Class="mt-4">
             <MudItem xs="12">
-                <MudText Typo="Typo.body1">Select a position to estimate the player:</MudText>
+                <MudText Typo="Typo.body1">Виберіть позицію для оцінки гравця:</MudText>
                 <MudSelect T="Guid?" Label="Position" @bind-Value="SelectedPositionId" Variant="Variant.Filled">
-                    <MudSelectItem Value="@((Guid?)null)" Disabled="true">Select a position</MudSelectItem>
+                    <MudSelectItem Value="@((Guid?)null)" Disabled="true">Виберіть позицію</MudSelectItem>
                     @foreach (var position in positions)
                     {
                         <MudSelectItem T="Guid?" Value="@position.Id">@position.Name</MudSelectItem>
@@ -25,7 +26,7 @@
             {
                 <MudItem xs="12">
                     <MudAlert Severity="Severity.Warning">
-                        Changing the position will overwrite previously set estimations for shared criteria.
+                        Зміна позиції перезапише попередньо встановлені оцінки для спільних критеріїв.
                     </MudAlert>
                 </MudItem>
             }
@@ -44,8 +45,8 @@
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="@CloseDialog" Color="Color.Secondary">Close</MudButton>
-        <MudButton OnClick="@Save" Color="Color.Primary">Save</MudButton>
+        <MudButton OnClick="@CloseDialog" Color="Color.Secondary">Закрити</MudButton>
+        <MudButton OnClick="@Save" Color="Color.Primary">Зберегти</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -55,6 +56,7 @@
 @inject TrainingMarkService TrainingMarkService
 
 @code {
+    private List<ActionTypeViewModel> actionTypes = new();
     private List<PositionViewModel> positions;
     private List<TrainingMarkViewModel> currentMarks = new();
     private List<TrainingMarkViewModel> updatedMarks = new();
@@ -76,9 +78,10 @@
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         positions = PositionService.Positions;
+        actionTypes = await MatchPlayerActionService.GetAllActionTypes();
         foreach (var positionCriteria in positions.SelectMany(x => x.Criteria))
         {
             positionCriteria.Criterion = CriterionService.Criteria.First(x => x.Id == positionCriteria.CriterionId);
@@ -101,7 +104,7 @@
         }
 
         currentMarks.Clear();
-        foreach (var positionCriterion in newPosition.Criteria)
+        foreach (var positionCriterion in newPosition.Criteria.Where(x => !actionTypes.Any(action => action.Name == x.Criterion.Name)))
         {
             var currentCriterionMark = allMarks.FirstOrDefault(x => x.CriterionId == positionCriterion.Criterion.Id);
 

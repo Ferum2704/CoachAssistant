@@ -64,7 +64,7 @@ namespace CoachAssistant.Server.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}, {nameof(ApplicationUserRole.Coach)}")]
         public async Task<IActionResult> GetByTeamIdAsync([FromQuery] Guid teamId)
         {
             var players = await playerService.GetPlayersByTeamIdAsync(teamId);

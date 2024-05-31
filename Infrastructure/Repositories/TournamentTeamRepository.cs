@@ -15,7 +15,7 @@ namespace Infrastructure.Repositories
 
         public new async Task<IReadOnlyCollection<TournamentTeam>> GetAsync(Expression<Func<TournamentTeam, bool>>? filter = null, CancellationToken cancellationToken = default)
         {
-            IQueryable<TournamentTeam> query = dbSet.Include(x => x.Team);
+            IQueryable<TournamentTeam> query = dbSet.Include(x => x.Team).ThenInclude(x => x.Club);
 
             if (filter is null)
             {

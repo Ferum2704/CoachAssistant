@@ -1,26 +1,56 @@
 ﻿@page "/tournament/{TournamentId}"
 
 @inject TournamentService TournamentService
+@inject IAccountManager AccountManager
+@inject IMapper Mapper
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
 
-<MudTabs>
-    <MudTabPanel Text="Teams">
-        <TeamsListTab Tournament="@Tournament" />
-    </MudTabPanel>
-    <MudTabPanel Text="Schedule">
-        <ScheduleTab Tournament="@Tournament" />
-    </MudTabPanel>
-</MudTabs>
+@if (Tournament is not null)
+{
+    <MudPaper Class="pa-4">
+        <MudGrid Justify="Justify.SpaceAround">
+            <MudItem xs="12" Class="d-flex justify-start align-center">
+                <MudText Typo="Typo.h5">@Tournament.Name</MudText>
+                @if (isManager)
+                {
+                    <MudIconButton Icon="@Icons.Filled.Edit" OnClick="@EditTournament" Color="Color.Primary" ToolTip="Edit Tournament" />
+                }
+            </MudItem>
+                <MudItem xs="12" Class="d-flex pt-0 mb-4">
+                <MudText Typo="Typo.subtitle1">@Tournament.TournamentType.ToString()</MudText>
+            </MudItem>
+        </MudGrid>
+        @if (isManager)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Filled.Delete" OnClick="@RemoveTournament">
+                Remove Tournament
+            </MudButton>
+        }
+    </MudPaper>
+
+    <MudTabs Class="mt-2">
+        <MudTabPanel Text="Teams" Class="justify-center">
+            <TeamsListTab Tournament="@Tournament" />
+        </MudTabPanel>
+        <MudTabPanel Text="Schedule" Class="justify-center">
+            <ScheduleTab Tournament="@Tournament" />
+        </MudTabPanel>
+    </MudTabs>
+}
 
 @code {
     [Parameter]
     public string TournamentId { get; set; }
     private string previousTournamentId;
+    private bool isManager = false;
 
     public TournamentViewModel Tournament { get; private set; }
 
     protected override async Task OnInitializedAsync()
     {
         await LoadTournament();
+        isManager = await AccountManager.IsUserInRole("Manager");
     }
 
     protected override async Task OnParametersSetAsync()
@@ -35,5 +65,41 @@
     {
         Tournament = await TournamentService.GetTournamentById(TournamentId);
         previousTournamentId = TournamentId;
+    }
+
+    private async Task EditTournament()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var parameters = new DialogParameters<AddEditTournamentDialog>();
+        parameters.Add(x => x.Tournament, Tournament);
+
+        var dialog = DialogService.Show<AddEditTournamentDialog>("Edit Team", parameters, options);
+        var result = (await dialog.Result).Data as TournamentViewModel;
+
+        if (result is not null)
+        {
+            var updatedTournament = await TournamentService.Edit(Tournament.Id.ToString(), Mapper.Map<TournamentModel>(result));
+            Tournament.Name = updatedTournament.Name;
+            Tournament.TournamentType = updatedTournament.TournamentType;
+            TournamentService.NotifyStateChanged();
+        }
+    }
+
+    private async Task RemoveTournament()
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            "Confirm Deletion",
+            $"Are you sure you want to delete {Tournament.Name} tournament?",
+            yesText: "Yes", cancelText: "No"
+        );
+
+        if (confirmed == true)
+        {
+            await TournamentService.Delete(Tournament.Id.ToString());
+
+            TournamentService.RemoveTournament(Tournament);
+        }
+
+        NavigationManager.NavigateTo("/", true);
     }
 }

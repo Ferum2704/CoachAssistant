@@ -6,6 +6,8 @@
 
         Task<TResult> PostAsync<TResult>(string url);
 
+        Task PostAsync(string url);
+
         Task PostAsync<T>(string url, T data);
 
         Task<TResult> PostAsync<TData, TResult>(string url, TData data);

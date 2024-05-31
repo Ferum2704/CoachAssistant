@@ -67,9 +67,8 @@
                 if (clubViewModel is not null)
                 {
                     CurrentTeamProvider.CurrentClub = clubViewModel;
+                    await TournamentService.LoadTeamTournaments(CurrentTeamProvider.CurrentClub.Team.Id);
                 }
-
-                await TournamentService.LoadTeamTournaments(CurrentTeamProvider.CurrentClub.Team.Id);
             }
 
             await PositionService.GetAll();

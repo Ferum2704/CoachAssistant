@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Services;
 using Application.Services.IService;
 using CoachAssistant.Server.Hubs;
 using CoachAssistant.Shared;
@@ -69,6 +70,24 @@ namespace CoachAssistant.Server.Api.Controllers
             }
 
             return Ok(tournaments);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpPut("{tournamentId}")]
+        public async Task<IActionResult> Put(Guid tournamentId, TournamentModel model)
+        {
+            var tournamentViewModel = await tournamentService.Edit(tournamentId, model);
+
+            return Ok(tournamentViewModel);
+        }
+
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Manager)}")]
+        [HttpDelete("{tournamentId}")]
+        public async Task<IActionResult> Delete(Guid tournamentId)
+        {
+            await tournamentService.Delete(tournamentId);
+
+            return Ok();
         }
     }
 }

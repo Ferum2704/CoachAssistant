@@ -7,6 +7,8 @@ namespace Application.Topsis
 {
     public class TopsisCalculator : ITopsisCalculator
     {
+        private IReadOnlyCollection<ActionType> actionTypes = new List<ActionType>();
+
         private readonly IUnitOfWork unitOfWork;
         private readonly IEstimationNormalizer estimationNormalizer;
         private readonly ICriteriaWeightNormalizer criteriaWeightNormalizer;
@@ -29,6 +31,7 @@ namespace Application.Topsis
             Position position,
             IReadOnlyCollection<Training> trainings)
         {
+            actionTypes = await unitOfWork.ActionTypeRepository.GetAsync();
             var playerScores = InitializePlayerScores(players, position, trainings);
 
             if (playerScores.Count == 0)
@@ -36,7 +39,15 @@ namespace Application.Topsis
                 return null;
             }
 
-            await IncludePlayerActions(players, position, playerScores);
+            if (playerScores.Count == 1)
+            {
+                return new Dictionary<Player, double>()
+                {
+                    { playerScores.First().Key, 1 }
+                };
+            }
+
+            await IncludePlayerActions(position, playerScores);
 
             var normalizedPlayerScores = estimationNormalizer.NormalizeScores(playerScores);
             var normalizedCriteriaWeights = criteriaWeightNormalizer.NormalizeWeights(position);
@@ -45,7 +56,7 @@ namespace Application.Topsis
             return ApplyTOPSIS(weightedNormalizedPlayerScores);
         }
 
-        private static Dictionary<Player, Dictionary<Criterion, float>> InitializePlayerScores(
+        private Dictionary<Player, Dictionary<Criterion, float>> InitializePlayerScores(
             IReadOnlyCollection<Player> players,
             Position position,
             IReadOnlyCollection<Training> trainings)
@@ -54,7 +65,7 @@ namespace Application.Topsis
             foreach (var player in players)
             {
                 var playerMarks = new Dictionary<Criterion, float>();
-                foreach (var criterion in position.Criteria)
+                foreach (var criterion in position.Criteria.Where(x => !actionTypes.Any(action => action.Name == x.Name)))
                 {
                     var marks = player.TrainingRecords
                         .Where(tr => trainings.Select(t => t.Id).Contains(tr.TrainingId))
@@ -69,7 +80,8 @@ namespace Application.Topsis
                     }
                 }
 
-                if (playerMarks.Count == position.Criteria.Count && playerMarks.Values.All(x => x > 0))
+                if (playerMarks.Count == position.Criteria.Where(x => !actionTypes.Any(action => action.Name == x.Name)).Count()
+                    && playerMarks.Values.All(x => x > 0))
                 {
                     scores[player] = playerMarks;
                 }
@@ -77,11 +89,11 @@ namespace Application.Topsis
             return scores;
         }
 
-        private async Task IncludePlayerActions(IReadOnlyCollection<Player> players, Position position, Dictionary<Player, Dictionary<Criterion, float>> playerScores)
+        private async Task IncludePlayerActions(Position position, Dictionary<Player, Dictionary<Criterion, float>> playerScores)
         {
-            foreach (var player in players)
+            foreach (var player in playerScores.Keys)
             {
-                foreach (var criterion in position.Criteria.Where(x => player.MatchPlayerActions.Any(action => action.ActionType.ToString() == x.Name)))
+                foreach (var criterion in position.Criteria.Where(x => actionTypes.Any(action => action.Name == x.Name)))
                 {
                     var actionType = (await unitOfWork.ActionTypeRepository.GetAsync(x => x.Name == criterion.Name)).FirstOrDefault();
 
@@ -90,7 +102,7 @@ namespace Application.Topsis
                         var playerActions = player.MatchPlayerActions.Where(x => x.ActionType.Name == actionType.Name).ToList();
                         var numberOfMatches = playerActions.Select(x => x.MatchId).Distinct().Count();
 
-                        int actionPerMatch = playerActions.Sum(a => a.ActionNumber) / numberOfMatches;
+                        int actionPerMatch = numberOfMatches != 0 ? playerActions.Sum(a => a.ActionNumber) / numberOfMatches : 0;
 
                         playerScores[player][criterion] = actionPerMatch;
                     }
@@ -98,25 +110,7 @@ namespace Application.Topsis
             }
         }
 
-        //private static int NormalizeActionScore(int actionCount, ActionType action)
-        //{
-        //    var benchmark = action.BenchmarkValue;
-        //    var isHigherPreferable = true; // action.IsHigherPreferable;
-
-        //    int normalizedValue;
-        //    if (isHigherPreferable)
-        //    {
-        //        normalizedValue = (int)Math.Round(actionCount / benchmark * 10);
-        //    }
-        //    else
-        //    {
-        //        normalizedValue = (int)Math.Round((1 - actionCount / benchmark) * 10);
-        //    }
-
-        //    return Math.Min(Math.Max(normalizedValue, 1), 10);
-        //}
-
-        public Dictionary<Player, double> ApplyTOPSIS(Dictionary<Player, Dictionary<Criterion, float>> weightedNormalizedPlayerScores)
+        public static Dictionary<Player, double> ApplyTOPSIS(Dictionary<Player, Dictionary<Criterion, float>> weightedNormalizedPlayerScores)
         {
             // Determine the ideal and negative-ideal solutions
             var idealSolution = new Dictionary<Criterion, float>();
@@ -126,16 +120,8 @@ namespace Application.Topsis
             {
                 var values = weightedNormalizedPlayerScores.Select(p => p.Value[criterion]).ToList();
 
-                if (criterion.ShouldBeMaximized)
-                {
-                    idealSolution[criterion] = values.Max();
-                    negativeIdealSolution[criterion] = values.Min();
-                }
-                else
-                {
-                    idealSolution[criterion] = values.Min();
-                    negativeIdealSolution[criterion] = values.Max();
-                }
+                idealSolution[criterion] = values.Max();
+                negativeIdealSolution[criterion] = values.Min();
             }
 
             // Calculate the Euclidean distances to the ideal and negative-ideal solutions

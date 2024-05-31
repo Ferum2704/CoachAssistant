@@ -2,6 +2,9 @@
 @using CoachAssistant.Client.Pages.Tournaments
 
 @attribute [Authorize]
+@inject TournamentService TournamentService
+@inject IAccountManager AccountManager
+@inject IMapper Mapper
 @inject IDialogService DialogService
 
 <AuthorizeView Roles="Manager">
@@ -16,9 +19,15 @@
     private async Task OpenAddTournamentDialog()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
-        var parameters = new DialogParameters();
+        var parameters = new DialogParameters<AddEditTournamentDialog>();
 
-        var dialog = DialogService.Show<AddTournamentDialog>("Add Tournament", parameters, options);
-        var result = await dialog.Result;
+        var dialog = DialogService.Show<AddEditTournamentDialog>("Edit Team", parameters, options);
+        var result = (await dialog.Result).Data as TournamentViewModel;
+
+        if (result is not null)
+        {
+            var newTournament = await TournamentService.Add(Mapper.Map<TournamentModel>(result));
+            TournamentService.AddTournament(newTournament);
+        }
     }
 }

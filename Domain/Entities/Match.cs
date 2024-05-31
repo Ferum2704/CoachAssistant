@@ -20,6 +20,6 @@ namespace Domain.Entities
 
         public IReadOnlyCollection<Team> Teams { get; set; }
 
-        public IReadOnlyCollection<MatchTeam> MatchTeams { get; set; }
+        public List<MatchTeam> MatchTeams { get; set; }
     }
 }

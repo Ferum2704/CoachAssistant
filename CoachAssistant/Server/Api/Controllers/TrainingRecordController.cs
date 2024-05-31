@@ -28,7 +28,15 @@ namespace CoachAssistant.Server.Api.Controllers
         [HttpPut("{trainingRecordId}")]
         public async Task<IActionResult> PutRecord(Guid trainingRecordId, TrainingRecordModel model)
         {
-            await trainingRecordService.Edit(trainingRecordId, model);
+            var record = await trainingRecordService.Edit(trainingRecordId, model);
+
+            return Ok(record);
+        }
+
+        [HttpPost("{trainingRecordId}/email")]
+        public async Task<IActionResult> Sendmail(Guid trainingRecordId)
+        {
+            await trainingRecordService.SendRecordByEmail(trainingRecordId);
 
             return Ok();
         }

@@ -19,14 +19,13 @@
             {
                 <MudTh>@actionType.Name</MudTh>
             }
-            <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Player">@context.Name @context.Surname</MudTd>
             @foreach (var actionType in actionTypes)
             {
                 <MudTd DataLabel="@actionType.Name">
-                    <MudNumericField T="int" Value="@(context.MatchPlayerActions.FirstOrDefault(x => x.ActionTypeId == actionType.Id)?.ActionNumber ?? 0)" ReadOnly="!isManager" ValueChanged="@(value => OnActionChanged(context, actionType, value))" />
+                    <MudNumericField T="int" Value="@(context.MatchPlayerActions.FirstOrDefault(x => x.ActionTypeId == actionType.Id && x.MatchId == MatchTeam.MatchId)?.ActionNumber ?? 0)" ReadOnly="!isManager" ValueChanged="@(value => OnActionChanged(context, actionType, value))" />
                 </MudTd>
             }
         </RowTemplate>
@@ -51,16 +50,17 @@
 
     private void OnActionChanged(PlayerViewModel player, ActionTypeViewModel actionType, int newValue)
     {
-        var action = player.MatchPlayerActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id);
-        if (action == null || newPlayersActions.Any(x => x.ActionTypeId == actionType.Id))
+        var action = player.MatchPlayerActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id && a.MatchId == MatchTeam.MatchId);
+        if (action == null || newPlayersActions.Any(x => x.ActionTypeId == actionType.Id && x.MatchId == MatchTeam.MatchId))
         {
-            var playerAction = newPlayersActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id);
+            var playerAction = newPlayersActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id && a.MatchId == MatchTeam.MatchId);
 
             if (playerAction is null)
             {
                 var newPlayerAction = new MatchPlayerActionViewModel
                     {
                         PlayerId = player.Id,
+                        MatchId = MatchTeam.MatchId,
                         ActionType = actionType,
                         ActionTypeId = actionType.Id,
                         ActionNumber = newValue

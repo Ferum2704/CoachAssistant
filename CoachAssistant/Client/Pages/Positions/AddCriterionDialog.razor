@@ -51,17 +51,21 @@
 
     async Task Submit()
     {
+        var addedCriteria = new List<PositionCriteriaViewModel>();
         foreach (var criterion in selectedCriteria)
         {
-            await PositionCriteriaService.Post(new PositionCriteriaModel
+            var addedCriterion = await PositionCriteriaService.Post(new PositionCriteriaModel
             {
                 PositionId = PositionId,
                 CriterionId = criterion.Id,
                 Weight = 1
             });
+
+            addedCriterion.Criterion = criterion;
+            addedCriteria.Add(addedCriterion);
         }
 
-        MudDialog.Close(DialogResult.Ok(true));
+        MudDialog.Close(DialogResult.Ok(addedCriteria));
     }
 
     void Cancel()

@@ -1,9 +1,11 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Lineup;
 using Application.Abstractions.Topsis;
+using Application.Emails;
 using Application.Services;
 using Application.Services.IService;
 using Application.Topsis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 

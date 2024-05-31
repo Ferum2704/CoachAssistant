@@ -4,6 +4,8 @@ using Application.Services.IService;
 using AutoMapper;
 using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared.ViewModels;
+using Domain.Entities;
+using System.Text;
 
 namespace Application.Services
 {
@@ -75,9 +77,32 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task SendRecordByEmail(Guid recordId)
+        public async Task SendRecordByEmail(Guid recordId)
         {
-            throw new NotImplementedException();
+            var training = await unitOfWork.TrainingRepository.GetSingleAsync(x => x.TrainingRecords.Select(x => x.Id).Contains(recordId));
+
+            if (training is not null)
+            {
+                var trainingRecord = await unitOfWork.TrainingRecordRepository.GetByIdAsync(recordId);
+                trainingRecord.Training = training;
+
+                var subject = $"{trainingRecord.Training.Name} - {trainingRecord.Training.StartDate.ToString("yyyy-MM-dd")}";
+                var content = new StringBuilder("<h1>Training Details</h1>");
+                content.Append($"<p><strong>Note:</strong> {trainingRecord.Note}</p>");
+                content.Append("<ul>");
+                foreach (var mark in trainingRecord.TrainingMarks)
+                {
+                    content.Append($"<li>{mark.Criterion.Name} - {mark.Mark}</li>");
+                }
+                content.Append("</ul>");
+                var message = new Message(
+                new List<string> { trainingRecord.Player.Email },
+                    subject,
+                    content.ToString()
+                );
+
+                await emailSender.SendEmailAsync(message);
+            }
         }
     }
 }

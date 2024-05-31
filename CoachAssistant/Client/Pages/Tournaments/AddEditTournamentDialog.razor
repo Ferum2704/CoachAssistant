@@ -1,0 +1,30 @@
+﻿<MudDialog>
+    <DialogContent>
+        <EditForm Model="@Tournament">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="Name" @bind-Value="Tournament.Name" />
+                    <MudSelect T="string" @bind-Value="Tournament.TournamentType" Variant="Variant.Text">
+                        <MudSelectItem Value="@("Friendly")" />
+                        <MudSelectItem Value="@("Cup")" />
+                        <MudSelectItem Value="@("LocalLeague")" />
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public TournamentViewModel Tournament { get; set; } = new();
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private void Save()
+    {
+        MudDialog.Close(Tournament);
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using CoachAssistant.Client.Network;
+using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared.ViewModels;
 
 namespace CoachAssistant.Client.Services
@@ -33,12 +34,27 @@ namespace CoachAssistant.Client.Services
             NotifyStateChanged();
         }
 
+        public void RemoveTournament(TournamentViewModel tournament)
+        {
+            Tournaments.Remove(tournament);
+            NotifyStateChanged();
+        }
+
+        public async Task<TournamentViewModel> Add(TournamentModel model) =>
+            await httpClientService.PostAsync<TournamentModel, TournamentViewModel>(ApiUrls.TournamentsUrl, model);
+
         public async Task<TournamentViewModel> GetTournamentById(string id) =>
             await httpClientService.GetAsync<TournamentViewModel>(ApiUrls.GetTournamentByIdUrl(id));
 
         public async Task<TournamentViewModel> GenerateSchedule(string tournamentId) =>
             await httpClientService.PostAsync<TournamentViewModel>(ApiUrls.GetMatchesByTournamentIdUrl(tournamentId));
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
+        public async Task<TournamentViewModel> Edit(string tournamentId, TournamentModel model) =>
+            await httpClientService.PutAsync<TournamentModel, TournamentViewModel>(ApiUrls.GetTournamentByIdUrl(tournamentId), model);
+
+        public async Task Delete(string tournamentId) =>
+            await httpClientService.DeleteAsync(ApiUrls.GetTournamentByIdUrl(tournamentId));
+
+        public void NotifyStateChanged() => OnChange?.Invoke();
     }
 }

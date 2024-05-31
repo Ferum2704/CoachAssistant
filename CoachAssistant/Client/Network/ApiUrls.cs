@@ -85,5 +85,7 @@
         public static string GetRejectTeamVerificationUrl(Guid clubId) => $"{GetTeamByIdUrl(clubId)}/verification/reject";
 
         public static string GetTrainingRecordByIdUrl(Guid recordId) => $"{TrainingRecordsUrl}/{recordId}";
+
+        public static string GetTrainingRecordEmailUrl(Guid recordId) => $"{TrainingRecordsUrl}/{recordId}/email";
     }
 }

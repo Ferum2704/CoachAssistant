@@ -17,19 +17,19 @@ else
         <MudGrid>
             <MudItem xs="12" Class="d-flex justify-start align-center">
                 <MudText Typo="Typo.h4" Color="Color.Primary">@club.Name</MudText>
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="EditTeam" Color="Color.Secondary" Size="Size.Small" />
-                </MudItem>
-                <MudItem xs="12" Class="py-1">
-                    <MudText Typo="Typo.subtitle1">@club.Region, @club.City</MudText>
-                    <MudText Typo="Typo.subtitle2">@club.Stadium</MudText>
-                </MudItem>
-                <MudItem xs="12" Class="d-flex align-center">
-                    <MudIcon Icon="@verificationIcon" Style="@verificationIconStyle" Class="mr-2" />
-                    <MudText Style="@verificationTextStyle">@verificationText</MudText>
-                    @if (club.Team.VerificationState == VerificationState.NotVerified)
-                    {
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Warning" Class="ml-1" OnClick="SendForVerification">Send on verification</MudButton>
-                    }
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="EditTeam" Color="Color.Secondary" Size="Size.Small" />
+            </MudItem>
+            <MudItem xs="12" Class="py-1">
+                <MudText Typo="Typo.subtitle1">@club.Region, @club.City</MudText>
+                <MudText Typo="Typo.subtitle2">@club.Stadium</MudText>
+            </MudItem>
+            <MudItem xs="12" Class="d-flex align-center">
+                <MudIcon Icon="@verificationIcon" Style="@verificationIconStyle" Class="mr-2" />
+                <MudText Style="@verificationTextStyle">@verificationText</MudText>
+                @if (club.Team.VerificationState == VerificationState.NotVerified)
+                {
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Warning" Class="ml-1" OnClick="SendForVerification">Send on verification</MudButton>
+                }
             </MudItem>
             <MudItem xs="12">
                 <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteTeam">Delete</MudButton>
@@ -40,6 +40,7 @@ else
 
 @inject IHttpClientService HttpClientService
 @inject ICurrentTeamProvider CurrentTeamProvider
+@inject NavigationManager NavigationManager
 @inject TeamService TeamService
 @inject IDialogService DialogService
 @inject IMapper Mapper;
@@ -55,10 +56,13 @@ else
 
     protected override void OnParametersSet()
     {
-        verificationIcon = GetVerificationIcon(club.Team.VerificationState);
-        verificationIconStyle = $"color: {GetVerificationColor(club.Team.VerificationState)}";
-        verificationText = GetVerificationText(club.Team.VerificationState);
-        verificationTextStyle = $"color: {GetVerificationColor(club.Team.VerificationState)}";
+        if (club is not null)
+        {
+            verificationIcon = GetVerificationIcon(club.Team.VerificationState);
+            verificationIconStyle = $"color: {GetVerificationColor(club.Team.VerificationState)}";
+            verificationText = GetVerificationText(club.Team.VerificationState);
+            verificationTextStyle = $"color: {GetVerificationColor(club.Team.VerificationState)}";
+        }
     }
 
     string GetVerificationIcon(VerificationState state) => state switch
@@ -102,7 +106,6 @@ else
         isEditMode = false;
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
         var parameters = new DialogParameters<AddEditTeamDialog>();
-        parameters.Add(x => x.Club, club);
 
         var dialog = DialogService.Show<AddEditTeamDialog>(isEditMode ? "Edit Team" : "Add Team", parameters, options);
         var result = (await dialog.Result).Data as ClubViewModel;
@@ -138,8 +141,18 @@ else
 
     private async Task DeleteTeam()
     {
-        await TeamService.Delete(club.Id);
+        var confirmed = await DialogService.ShowMessageBox(
+            "Confirm Deletion",
+            $"Are you sure you want to delete the team and all data related to it?",
+            yesText: "Yes", cancelText: "No"
+        );
 
-        CurrentTeamProvider.CurrentClub = null;
+        if (confirmed == true)
+        {
+            await TeamService.Delete(club.Id);
+
+            CurrentTeamProvider.CurrentClub = null;
+            NavigationManager.NavigateTo("/", true);
+        }
     }
 }

@@ -4,6 +4,7 @@ using AutoMapper;
 using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared.ViewModels;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Services
 {
@@ -30,9 +31,12 @@ namespace Application.Services
             return mapper.Map<TournamentViewModel>(tournament);
         }
 
-        public Task Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            var tournament = await unitOfWork.TournamentRepository.GetByIdAsync(id);
+
+            unitOfWork.TournamentRepository.Remove(tournament);
+            await unitOfWork.SaveAsync();
         }
 
         public Task DeleteBulk<TEntity>(Func<TEntity, bool> predicate)
@@ -45,9 +49,27 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<TournamentViewModel> Edit(Guid id, TournamentModel model)
+        public async Task<TournamentViewModel> Edit(Guid id, TournamentModel model)
         {
-            throw new NotImplementedException();
+            var tournament = await unitOfWork.TournamentRepository.GetByIdAsync(id);
+
+            if (tournament is not null)
+            {
+                if (tournament.Name != model.Name)
+                {
+                    tournament.Name = model.Name;
+                }
+
+                Enum.TryParse(model.Name, out TournamentType newType);
+                if (tournament.TournamentType.ToString() != newType.ToString())
+                {
+                    tournament.TournamentType = newType;
+                }
+                unitOfWork.TournamentRepository.Update(tournament);
+                await unitOfWork.SaveAsync();
+            }
+
+            return mapper.Map<TournamentViewModel>(tournament);
         }
 
         public async Task<TournamentViewModel> GenerateTournamentMatches(Guid tournamentId)

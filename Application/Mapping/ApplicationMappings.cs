@@ -63,6 +63,8 @@ namespace Application.Mapping
 
             cfg.CreateMap<ActionTypeModel, ActionType>();
             cfg.CreateMap<ActionType, ActionTypeViewModel>();
+            cfg.CreateMap<MatchPlayerActionModel, MatchPlayerAction>();
+            cfg.CreateMap<MatchPlayerAction, MatchPlayerActionViewModel>();
         }
     }
 }

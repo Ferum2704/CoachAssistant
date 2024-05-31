@@ -28,7 +28,7 @@
                             </MudItem>
                         </MudGrid>
                     }
-                    <MudButton OnClick="() => AddCriterion(position.Id)" Color="Color.Primary">Add Criterion</MudButton>
+                    <MudButton OnClick="() => AddCriterion(position)" Color="Color.Primary">Add Criterion</MudButton>
                     <MudButton OnClick="() => SaveChanges(position.Id)" Color="Color.Secondary" Disabled="!IsDirty(position.Id)">Save Changes</MudButton>
                 </MudCardContent>
             </MudCard>
@@ -42,15 +42,10 @@
 
     protected override void OnInitialized()
     {
-        positions = PositionService.Positions;
-
-        foreach (var positionCriteria in positions.SelectMany(x => x.Criteria))
-        {
-            positionCriteria.Criterion = CriterionService.Criteria.First(x => x.Id == positionCriteria.CriterionId);
-        }
+        InitializePositions();
     }
 
-    void UpdateWeight(Guid positionId, Guid positionCriterionId, float newWeight)
+    private void UpdateWeight(Guid positionId, Guid positionCriterionId, float newWeight)
     {
         var position = positions.FirstOrDefault(p => p.Id == positionId);
         var criterion = position?.Criteria.FirstOrDefault(c => c.Id == positionCriterionId);
@@ -72,29 +67,39 @@
         }
     }
 
-    void AddCriterion(Guid positionId)
+    private async Task AddCriterion(PositionViewModel position)
     {
         var parameters = new DialogParameters<AddCriterionDialog>();
-        parameters.Add(x => x.PositionId, positionId);
+        parameters.Add(x => x.PositionId, position.Id);
 
-        DialogService.Show<AddCriterionDialog>("Add Criteria", parameters, new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small });
+        var dialog = DialogService.Show<AddCriterionDialog>(
+            "Add Criteria", 
+            parameters, 
+            new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth=true });
+
+        var addedCriteria = (await dialog.Result).Data as List<PositionCriteriaViewModel>;
+
+        if (addedCriteria is not null)
+        {
+            position.Criteria.AddRange(addedCriteria);
+        }
     }
 
-    async Task SaveChanges(Guid positionId)
+    private async Task SaveChanges(Guid positionId)
     {
         await PositionCriteriaService.EditRange(updatedPositionCriteria[positionId]);
         await PositionService.GetAll();
         var isSuccess = updatedPositionCriteria.Remove(positionId);
 
-        StateHasChanged();
+        InitializePositions();
     }
 
-    bool IsDirty(Guid positionId)
+    private bool IsDirty(Guid positionId)
     {
         return updatedPositionCriteria.ContainsKey(positionId);
     }
 
-    async Task DeleteCriterion(Guid positionId, Guid positionCriterionId)
+    private async Task DeleteCriterion(Guid positionId, Guid positionCriterionId)
     {
         var position = positions.FirstOrDefault(p => p.Id == positionId);
         var criterion = position?.Criteria.FirstOrDefault(c => c.Id == positionCriterionId);
@@ -106,4 +111,13 @@
         }
     }
 
+    private void InitializePositions()
+    {
+        positions = PositionService.Positions;
+
+        foreach (var positionCriteria in positions.SelectMany(x => x.Criteria))
+        {
+            positionCriteria.Criterion = CriterionService.Criteria.First(x => x.Id == positionCriteria.CriterionId);
+        }
+    }
 }

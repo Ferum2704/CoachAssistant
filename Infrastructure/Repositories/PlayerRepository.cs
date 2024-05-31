@@ -23,6 +23,8 @@ namespace Infrastructure.Repositories
         public new async Task<IReadOnlyCollection<Player>> GetAsync(Expression<Func<Player, bool>>? filter = null, CancellationToken cancellationToken = default)
         {
             IQueryable<Player> query = dbSet
+                .Include (x => x.TrainingRecords)
+                .ThenInclude (x => x.TrainingMarks)
                 .Include(x => x.MatchPlayerActions);
 
             if (filter is null)
