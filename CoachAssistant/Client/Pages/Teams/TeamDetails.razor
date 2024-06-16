@@ -5,9 +5,9 @@
 {
     <MudPaper Class="d-flex flex-column align-center justify-center" MaxWidth="100vw" Height="100vh">
         <MudIcon Icon="@Icons.Material.Filled.Error" Style="font-size: 150px; color: red"/>
-        <MudText Typo="Typo.h3">You don't have a team yet.</MudText>
+        <MudText Typo="Typo.h3">Ви ще не маєте команди</MudText>
         <MudButton Class="mt-4" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" OnClick="AddTeam">
-            Add team
+            Додати команду
         </MudButton>
     </MudPaper>
 }
@@ -28,11 +28,11 @@ else
                 <MudText Style="@verificationTextStyle">@verificationText</MudText>
                 @if (club.Team.VerificationState == VerificationState.NotVerified)
                 {
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Warning" Class="ml-1" OnClick="SendForVerification">Send on verification</MudButton>
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Warning" Class="ml-1" OnClick="SendForVerification">Відправити на верифікацію</MudButton>
                 }
             </MudItem>
             <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteTeam">Delete</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteTeam">Видалити</MudButton>
             </MudItem>
         </MudGrid>
     </MudPaper>
@@ -83,9 +83,9 @@ else
 
     string GetVerificationText(VerificationState state) => state switch
     {
-        VerificationState.NotVerified => "Not Verified",
-        VerificationState.InProgress => "Verification In Progress",
-        VerificationState.Verified => "Verified",
+        VerificationState.NotVerified => "Не верифікована",
+        VerificationState.InProgress => "Верифікаія в очікуванні",
+        VerificationState.Verified => "Верифікована",
         _ => "Unknown Status"
     };
 
@@ -107,7 +107,7 @@ else
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
         var parameters = new DialogParameters<AddEditTeamDialog>();
 
-        var dialog = DialogService.Show<AddEditTeamDialog>(isEditMode ? "Edit Team" : "Add Team", parameters, options);
+        var dialog = DialogService.Show<AddEditTeamDialog>(isEditMode ? "Редагувати Команду" : "Додати Команду", parameters, options);
         var result = (await dialog.Result).Data as ClubViewModel;
 
         if (result is not null)
@@ -123,7 +123,7 @@ else
         var parameters = new DialogParameters<AddEditTeamDialog>();
         parameters.Add(x => x.Club, club);
 
-        var dialog = DialogService.Show<AddEditTeamDialog>(isEditMode ? "Edit Team" : "Add Team", parameters, options);
+        var dialog = DialogService.Show<AddEditTeamDialog>(isEditMode ? "Редагувати Команду" : "Додати Команду", parameters, options);
         var result = (await dialog.Result).Data as ClubViewModel;
 
         if (result is not null)
@@ -142,9 +142,9 @@ else
     private async Task DeleteTeam()
     {
         var confirmed = await DialogService.ShowMessageBox(
-            "Confirm Deletion",
-            $"Are you sure you want to delete the team and all data related to it?",
-            yesText: "Yes", cancelText: "No"
+            "Підтвердити видалення",
+            $"Ви впевнені, що хочете видалити команду і всі дані, пов'язані з нею?",
+            yesText: "Так", cancelText: "Ні"
         );
 
         if (confirmed == true)

@@ -3,12 +3,12 @@
 @inject NavigationManager NavigationManager
 
 <MudContainer Class="py-4">
-    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Match Schedule</MudText>
+    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Розклад матчів</MudText>
 
     @if (matches == null || matches.Count == 0)
     {
         <MudGrid Justify="Justify.Center" Class="mt-3">
-            <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="@GenerateSchedule" Size="Size.Large">Generate Schedule</MudButton>
+            <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="@GenerateSchedule" Size="Size.Large">Згенерувати склад</MudButton>
         </MudGrid>
     }
     else

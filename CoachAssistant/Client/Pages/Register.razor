@@ -1,21 +1,22 @@
 ﻿@page "/register"
 
-<MudPaper Elevation="25">
-    <MudContainer>
+<MudPaper Style="height: 100vh; width: 100vw; background: url('/images/login.png') no-repeat center center fixed; background-size: cover; display: flex; align-items: center; justify-content: center;" Elevation="0">
+    <MudContainer Style="background-color: rgba(0, 0, 0, 0.6); padding: 2rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px;">
         <EditForm Model="@user" OnValidSubmit="RegisterUser">
             <DataAnnotationsValidator />
-            <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="2">
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField @bind-Value="user.FirstName" Label="First name" Variant="Variant.Outlined" FullWidth />
-                     <MudTextField @bind-Value="user.LastName" Label="Last name" Variant="Variant.Outlined" FullWidth />
-                     <MudTextField @bind-Value="user.Username" Label="Username" Variant="Variant.Outlined" FullWidth />
-                     <MudSelect T="string" @bind-Value="@user.Role" Variant="Variant.Text">
+            <MudText Typo="Typo.h3" Style="color: white; text-align: center; margin-bottom: 20px;">Вітаємо в Team Assistant!</MudText>
+            <MudGrid Justify="Justify.Center" Spacing="2">
+                <MudItem xs="12" sm="12" md="12">
+                    <MudTextField @bind-Value="user.FirstName" Label="Ім'я'" Variant="Variant.Outlined" FullWidth Style="margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.8);" />
+                     <MudTextField @bind-Value="user.LastName" Label="Прізвище" Variant="Variant.Outlined" FullWidth Style="margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.8);"  />
+                     <MudTextField @bind-Value="user.Username" Label="Юзернейм" Variant="Variant.Outlined" FullWidth Style="margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.8);" />
+                     <MudSelect T="string" @bind-Value="@user.Role" Variant="Variant.Text" Style="margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.8);">
                          <MudSelectItem Value="@("Manager")"/>
                          <MudSelectItem Value="@("Coach")" />
                      </MudSelect>
-                     <MudTextField @bind-Value="user.Password" Label="Password" Variant="Variant.Outlined" FullWidth InputType="InputType.Password" />
-                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth Class="mt-2">Register</MudButton>
-                     <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" FullWidth Class="mt-2" OnClick="@NavigateToLogin">Back to login</MudButton>
+                     <MudTextField @bind-Value="user.Password" Label="Пароль" Variant="Variant.Outlined" FullWidth InputType="InputType.Password" Style="margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.8);" />
+                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth Class="mt-2">Зареєструватися</MudButton>
+                     <MudButton Variant="Variant.Filled" Color="Color.Success" FullWidth Class="mt-2" OnClick="@NavigateToLogin">Повернутися на сторінку входу</MudButton>
                  </MudItem>
              </MudGrid>
          </EditForm>

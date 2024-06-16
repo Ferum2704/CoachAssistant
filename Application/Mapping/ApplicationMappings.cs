@@ -17,10 +17,14 @@ namespace Application.Mapping
             cfg.CreateMap<Player, PlayerViewModel>();
             cfg.CreateMap<TrainingModel, Training>()
                 .ForMember(x => x.Id, act => act.MapFrom(x => Guid.NewGuid()))
+                .ForMember(dest => dest.StartDate,
+                    opt => opt.MapFrom(src => src.StartTime.HasValue ?
+                        src.StartDate.Add(src.StartTime.Value) : src.StartDate))
                 .ForMember(x => x.Team, act => act.Ignore())
                 .ForMember(x => x.Players, act => act.Ignore())
                 .ForMember(x => x.TrainingRecords, act => act.Ignore());
-            cfg.CreateMap<Training, TrainingViewModel>();
+            cfg.CreateMap<Training, TrainingViewModel>()
+                .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.StartDate.TimeOfDay));
             cfg.CreateMap<TrainingRecord, TrainingRecordViewModel>();
             cfg.CreateMap<TrainingMark, TrainingMarkViewModel>();
             cfg.CreateMap<TrainingMarkModel, TrainingMark>()

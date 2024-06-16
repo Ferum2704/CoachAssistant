@@ -6,22 +6,22 @@
 <MudPaper Class="mt-4 pa-2" Elevation="2">
     <MudGrid Class="mb-1">
         <MudItem xs="12" sm="6">
-            <MudText Typo="Typo.h5" Color="Color.Primary">Players Statistics for @MatchTeam.Team.Name</MudText>
+            <MudText Typo="Typo.h5" Color="Color.Primary">Статистика гравців команди @MatchTeam.Team.Name</MudText>
         </MudItem>
         <MudItem xs="12" sm="6" Class="d-flex justify-end">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@SaveChanges" Disabled="!hasChanges">Save Changes</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@SaveChanges" Disabled="!hasChanges">Зберегти зміни</MudButton>
         </MudItem>
     </MudGrid>
         <MudTable Items="@MatchTeam.Team.Players" Dense Bordered Striped Hover="true">
          <HeaderContent>
-             <MudTh>Player</MudTh>
+             <MudTh>Гравець</MudTh>
              @foreach (var actionType in actionTypes)
             {
                 <MudTh>@actionType.Name</MudTh>
             }
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Player">@context.Name @context.Surname</MudTd>
+            <MudTd Style="@GetRowStyle(@context)" DataLabel="Player">@context.Name @context.Surname</MudTd>
             @foreach (var actionType in actionTypes)
             {
                 <MudTd DataLabel="@actionType.Name">
@@ -41,6 +41,7 @@
     private List<MatchPlayerActionViewModel> newPlayersActions = new();
     private bool hasChanges = false;
     private bool isManager = false;
+    private HashSet<Guid> startingPlayerIds = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,12 +49,52 @@
         isManager = await AccountManager.IsUserInRole("Manager");
     }
 
+    protected override void OnParametersSet()
+    {
+        LoadPlayersAndPositions();
+        LoadStartingPlayers();
+    }
+
+    private void LoadPlayersAndPositions()
+    {
+        if (MatchTeam is not null)
+        {
+            foreach (var lineupPosition in MatchTeam.LineupPositions)
+            {
+                lineupPosition.MatchLineupPositionPlayers = lineupPosition.MatchLineupPositionPlayers.OrderByDescending(p => p.Score).ToList();
+
+                foreach (var positionPlayer in lineupPosition.MatchLineupPositionPlayers)
+                {
+                    if (MatchTeam?.Team?.Players?.Any() ?? false)
+                    {
+                        positionPlayer.Player = MatchTeam.Team.Players.First(x => x.Id == positionPlayer.PlayerId);
+                    }
+                }
+            }
+        }
+    }
+
+    private void LoadStartingPlayers()
+    {
+        if (MatchTeam?.LineupPositions != null)
+        {
+            foreach (var lineupPosition in MatchTeam.LineupPositions)
+            {
+                if (lineupPosition.MatchLineupPositionPlayers?.Any() ?? false)
+                {
+                    var startingPlayer = lineupPosition.MatchLineupPositionPlayers.First();
+                    startingPlayerIds.Add(startingPlayer.PlayerId);
+                }
+            }
+        }
+    }
+
     private void OnActionChanged(PlayerViewModel player, ActionTypeViewModel actionType, int newValue)
     {
         var action = player.MatchPlayerActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id && a.MatchId == MatchTeam.MatchId);
         if (action == null || newPlayersActions.Any(x => x.ActionTypeId == actionType.Id && x.MatchId == MatchTeam.MatchId))
         {
-            var playerAction = newPlayersActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id && a.MatchId == MatchTeam.MatchId);
+            var playerAction = newPlayersActions.FirstOrDefault(a => a.ActionTypeId == actionType.Id && a.MatchId == MatchTeam.MatchId && a.PlayerId == player.Id);
 
             if (playerAction is null)
             {
@@ -96,5 +137,8 @@
 
         hasChanges = false;
     }
+
+    private string GetRowStyle(PlayerViewModel player) =>
+        startingPlayerIds.Contains(player.Id) ? "background-color: #d1e7dd;" : string.Empty;
 }
 

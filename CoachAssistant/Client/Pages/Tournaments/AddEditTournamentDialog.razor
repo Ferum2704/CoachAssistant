@@ -3,18 +3,18 @@
         <EditForm Model="@Tournament">
             <MudGrid>
                 <MudItem xs="12">
-                    <MudTextField Label="Name" @bind-Value="Tournament.Name" />
+                    <MudTextField Label="Назва" @bind-Value="Tournament.Name" />
                     <MudSelect T="string" @bind-Value="Tournament.TournamentType" Variant="Variant.Text">
-                        <MudSelectItem Value="@("Friendly")" />
-                        <MudSelectItem Value="@("Cup")" />
-                        <MudSelectItem Value="@("LocalLeague")" />
+                        <MudSelectItem Value="@("Дружній")" />
+                        <MudSelectItem Value="@("Кубок")" />
+                        <MudSelectItem Value="@("Ліга")" />
                     </MudSelect>
                 </MudItem>
             </MudGrid>
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Зберегти</MudButton>
     </DialogActions>
 </MudDialog>
 

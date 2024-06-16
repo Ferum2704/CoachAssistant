@@ -1,8 +1,8 @@
 ﻿
 <MudDialog>
     <DialogContent>
-        <MudSelect T="Guid?" Label="Select player to add" @bind-Value="selectedPlayer" ToStringFunc="@((guid) => GetPlayerNameByGuid(guid))">
-            <MudSelectItem T="Guid?" Value="@((Guid?)null)" Disabled="true">Select a team</MudSelectItem>
+        <MudSelect T="Guid?" Label="Виберіть гравця для додавання" @bind-Value="selectedPlayer" ToStringFunc="@((guid) => GetPlayerNameByGuid(guid))">
+            <MudSelectItem T="Guid?" Value="@((Guid?)null)" Disabled="true">Виберіть гравця</MudSelectItem>
             @foreach (var player in AvailablePlayers)
             {
                 <MudSelectItem T="Guid?" Value="@player.Id">@($"{player.Name} {player.Surname}")</MudSelectItem>
@@ -10,8 +10,8 @@
         </MudSelect>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" OnClick="@Submit">Add</MudButton>
-        <MudButton Color="Color.Secondary" OnClick="@Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@Submit">Додати</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="@Cancel">Скасувати</MudButton>
     </DialogActions>
 </MudDialog>
 

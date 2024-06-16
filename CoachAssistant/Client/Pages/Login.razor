@@ -1,19 +1,20 @@
 ﻿@page "/login"
 
-<MudPaper Elevation="25">
-    <MudContainer>
+<MudPaper Style="height: 100vh; width: 100vw; background: url('/images/login.png') no-repeat fixed; overflow: hidden; background-size: cover; display: flex; align-items: center; justify-content: center;" Elevation="0">
+    <MudContainer Style="background-color: rgba(0, 0, 0, 0.6); padding: 2rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px; max-height: 50vh; overflow: hidden;">
+        <MudText Typo="Typo.h3" Style="color: white; text-align: center; margin-bottom: 20px;">Вітаємо в Team Assistant!</MudText>
         <EditForm Model="@user" OnValidSubmit="LoginUser">
-            <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
-                <MudItem xs="12" sm="6" md="4">
-                    <MudTextField @bind-Value="user.Username" Label="Username" Variant="Variant.Outlined" FullWidth />
-                     <MudTextField @bind-Value="user.Password" Label="Password" Variant="Variant.Outlined" FullWidth InputType="InputType.Password" />
-                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth Class="mt-2">Log in</MudButton>
-                    <MudButton Variant="Variant.Text" Color="Color.Secondary" FullWidth OnClick="@NavigateToRegister" Class="mt-2">Register</MudButton>
-                 </MudItem>
-             </MudGrid>
-         </EditForm>
-     </MudContainer>
- </MudPaper>
+            <MudGrid Justify="Justify.Center" Style="align-items: center" Spacing="2">
+                <MudItem xs="12" sm="12" md="12">
+                    <MudTextField @bind-Value="user.Username" Label="Юзернейм" Variant="Variant.Outlined" FullWidth Style="margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.8);" />
+                     <MudTextField @bind-Value="user.Password" Label="Пароль" Variant="Variant.Outlined" FullWidth InputType="InputType.Password" Style="margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.8);" />
+                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth Style="margin-bottom: 10px;">Увійти</MudButton>
+                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" FullWidth OnClick="@NavigateToRegister" Class="mt-2">Зареєструватися</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudContainer>
+</MudPaper>
 
 @inject ILocalStorageService LocalStorage
 @inject AuthenticationStateProvider AuthStateProvider

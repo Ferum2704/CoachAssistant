@@ -14,7 +14,7 @@
                 <MudText Typo="Typo.h5">@Tournament.Name</MudText>
                 @if (isManager)
                 {
-                    <MudIconButton Icon="@Icons.Filled.Edit" OnClick="@EditTournament" Color="Color.Primary" ToolTip="Edit Tournament" />
+                    <MudIconButton Icon="@Icons.Filled.Edit" OnClick="@EditTournament" Color="Color.Primary" />
                 }
             </MudItem>
                 <MudItem xs="12" Class="d-flex pt-0 mb-4">
@@ -24,7 +24,7 @@
         @if (isManager)
         {
             <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Filled.Delete" OnClick="@RemoveTournament">
-                Remove Tournament
+                Видалити турнір
             </MudButton>
         }
     </MudPaper>
@@ -88,9 +88,9 @@
     private async Task RemoveTournament()
     {
         var confirmed = await DialogService.ShowMessageBox(
-            "Confirm Deletion",
-            $"Are you sure you want to delete {Tournament.Name} tournament?",
-            yesText: "Yes", cancelText: "No"
+            "Підтвердити видалення",
+            $"Ви впевнені, що хочете видалити {Tournament.Name} tournament?",
+            yesText: "Так", cancelText: "Ні"
         );
 
         if (confirmed == true)

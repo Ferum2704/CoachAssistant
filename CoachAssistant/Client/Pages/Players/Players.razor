@@ -9,23 +9,23 @@
 <MudPaper Elevation="1" Class="pa-4">
     <MudGrid>
         <MudItem xs="12" Class="d-flex justify-end">
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddPlayer">Add Player</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddPlayer">Додати гравця</MudButton>
         </MudItem>
         <MudItem xs="12">
             <MudTable Items="@players" Dense="true" Striped="true" Bordered="true">
                 <HeaderContent>
-                    <MudTh><MudText Typo="Typo.h6">First Name</MudText></MudTh>
-                    <MudTh><MudText Typo="Typo.h6">Last Name</MudText></MudTh>
-                    <MudTh><MudText Typo="Typo.h6">Email</MudText></MudTh>
-                    <MudTh Style="width: 20%"><MudText Typo="Typo.h6">Actions</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.h6">Ім'я</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.h6">Прізвище</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.h6">Пошта</MudText></MudTh>
+                    <MudTh Style="width: 20%"><MudText Typo="Typo.h6"></MudText></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="First Name">@context.Name</MudTd>
-                    <MudTd DataLabel="Last Name">@context.Surname</MudTd>
-                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Ім'я">@context.Name</MudTd>
+                    <MudTd DataLabel="Прізвище">@context.Surname</MudTd>
+                    <MudTd DataLabel="Пошта">@context.Email</MudTd>
                     <MudTd Class="d-flex justify-space-around">
-                        <MudButton StartIcon="@Icons.Filled.Edit" Color="Color.Secondary" OnClick="@(() => EditPlayer(context))">Edit</MudButton>
-                        <MudButton StartIcon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(() => ConfirmRemovePlayer(context))">Delete</MudButton>
+                        <MudButton StartIcon="@Icons.Filled.Edit" Color="Color.Secondary" OnClick="@(() => EditPlayer(context))">Редагувати</MudButton>
+                        <MudButton StartIcon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(() => ConfirmRemovePlayer(context))">Видалити</MudButton>
                         <MudIconButton Icon="@Icons.Filled.ArrowForward" Color="Color.Primary" OnClick="@(() => ViewDetails(context))"></MudIconButton>
                     </MudTd>
                 </RowTemplate>
@@ -57,7 +57,7 @@
         var parameters = new DialogParameters<AddEditPlayerDialog>();
 
         var dialog = DialogService.Show<AddEditPlayerDialog>(
-            isEditMode ? "Edit Player" : "Add Player",
+            isEditMode ? "Редагувати гравця" : "Додати гравця",
             parameters,
             new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
         var result = (await dialog.Result).Data as PlayerViewModel;
@@ -78,13 +78,13 @@
         parameters.Add(x => x.Player, playerViewModel);
 
         var dialog = DialogService.Show<AddEditPlayerDialog>(
-            isEditMode ? "Edit Player" : "Add Player",
+            isEditMode ? "Редагувати гравця" : "Додати гравця",
             parameters,
             new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
         var result = (await dialog.Result).Data as PlayerViewModel;
         var playerModel = Mapper.Map<PlayerModel>(result);
 
-        var player = await PlayerService.Edit(currentTeam.Id, playerViewModel.Id, playerModel);
+        var player = await PlayerService.Edit(currentTeam.Id, playerViewModel.Id.ToString(), playerModel);
 
         if (player is not null)
         {
@@ -96,9 +96,9 @@
     private async Task ConfirmRemovePlayer(PlayerViewModel player)
     {
         var confirmed = await DialogService.ShowMessageBox(
-            "Confirm Deletion",
-            $"Are you sure you want to delete the player: {player.Name} {player.Surname}?",
-            yesText: "Yes", cancelText: "No"
+            "Підтвердити видалення",
+            $"Ви впевнені, що хочете видалити гравця: {player.Name} {player.Surname}?",
+            yesText: "Так", cancelText: "Ні"
         );
 
         if (confirmed == true)
@@ -109,7 +109,7 @@
 
     private async Task RemovePlayer(PlayerViewModel player)
     {
-        await PlayerService.Delete(currentTeam.Id, player.Id);
+        await PlayerService.Delete(currentTeam.Id, player.Id.ToString());
         players.Remove(player);
     }
 }

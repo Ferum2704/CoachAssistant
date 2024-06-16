@@ -9,20 +9,20 @@
     {
         <MudGrid Class="mb-2">
             <MudItem xs="9">
-                <MudText Typo="Typo.h5">Teams in @Tournament.Name</MudText>
+                <MudText Typo="Typo.h5">Команди в @Tournament.Name</MudText>
                 </MudItem>
                 <MudItem xs="3" Class="d-flex justify-end">
                     @if (isManager)
                 {
-                    <MudButton OnClick="@AddTeam" Color="Color.Primary" Variant="Variant.Filled">Add Team</MudButton>
+                    <MudButton OnClick="@AddTeam" Color="Color.Primary" Variant="Variant.Filled">Додати команду</MudButton>
                 }
             </MudItem>
         </MudGrid>
         <MudTable Items="@clubs" Striped="true">
             <HeaderContent>
-                <MudTh>Name</MudTh>
-                <MudTh>City</MudTh>
-                <MudTh Style="width: 20%">Actions</MudTh>
+                <MudTh>Назва</MudTh>
+                <MudTh>Населений пункт</MudTh>
+                <MudTh Style="width: 20%"></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
@@ -30,7 +30,7 @@
                     <MudTd>
                         @if (isManager)
                     {
-                        <MudButton Icon="@Icons.Filled.Delete" Color="Color.Error" Disabled="@IsScheduleGenerated" OnClick="@(() => RemoveTeam(context))">Remove</MudButton>
+                        <MudButton Icon="@Icons.Filled.Delete" Color="Color.Error" Disabled="@IsScheduleGenerated" OnClick="@(() => RemoveTeam(context))">Видалити з турніру</MudButton>
                     }
                 </MudTd>
             </RowTemplate>
@@ -105,9 +105,9 @@
     private async Task RemoveTeam(ClubViewModel club)
     {
         var confirmed = await DialogService.ShowMessageBox(
-            "Confirm Deletion",
+            "Підтвердити видалення",
             $"Are you sure you want to remove team from tournament: {club.Name}?",
-            yesText: "Yes", cancelText: "No"
+            yesText: "Так", cancelText: "Ні"
         );
 
         if (confirmed == true)

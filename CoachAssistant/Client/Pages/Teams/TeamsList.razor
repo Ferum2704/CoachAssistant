@@ -5,11 +5,11 @@
     <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">Teams list</MudText>
     <MudTable Items="clubs" Striped="true">
         <HeaderContent>
-            <MudTh Style="width: 20%">Name</MudTh>
-            <MudTh Style="width: 20%">Region</MudTh>
-            <MudTh Style="width: 20%">City</MudTh>
-            <MudTh Style="width: 20%">Stadium</MudTh>
-            <MudTh Style="width: 10%">Verification State</MudTh>
+            <MudTh Style="width: 20%">Назва</MudTh>
+            <MudTh Style="width: 20%">Регіон</MudTh>
+            <MudTh Style="width: 20%">Населений пункт</MudTh>
+            <MudTh Style="width: 20%">Стадіон</MudTh>
+            <MudTh Style="width: 10%">Стан верифікації</MudTh>
             <MudTh Style="width: 10%"></MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -46,9 +46,9 @@
 
     private string GetStateText(VerificationState state) => state switch
     {
-        VerificationState.NotVerified => "Not Verified",
-        VerificationState.InProgress => "In Progress",
-        VerificationState.Verified => "Verified",
+        VerificationState.NotVerified => "Не верифікована",
+        VerificationState.InProgress => "В очікуванні",
+        VerificationState.Verified => "Верифікована",
         _ => "Unknown"
     };
 

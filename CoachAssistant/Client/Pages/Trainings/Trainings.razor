@@ -27,8 +27,8 @@
                                 <MudText Style="color: gray;">@training.Description</MudText>
                             </MudItem>
                             <MudItem xs="3" Style="text-align: right;">
-                                    <MudButton OnClick="() => EditTraining(training)" StartIcon="@Icons.Filled.Edit" Color="Color.Secondary" Style="margin-right: 10px;">Edit</MudButton>
-                                    <MudButton OnClick="() => ConfirmRemoveTraining(training)" StartIcon="@Icons.Filled.Delete" Color="Color.Error">Remove</MudButton>
+                                    <MudButton OnClick="() => EditTraining(training)" StartIcon="@Icons.Filled.Edit" Color="Color.Secondary" Style="margin-right: 10px;">Редагувати</MudButton>
+                                    <MudButton OnClick="() => ConfirmRemoveTraining(training)" StartIcon="@Icons.Filled.Delete" Color="Color.Error">Видалити</MudButton>
                                 <MudIconButton OnClick="() => NavigateToTraining(training.Id)" Icon="@Icons.Filled.ArrowForward"/> 
                             </MudItem>
                         </MudGrid>
@@ -93,7 +93,7 @@
         var parameters = new DialogParameters<AddEditTrainingDialog>();
 
         var dialog = DialogService.Show<AddEditTrainingDialog>(
-            isEditMode ? "Edit Training" : "Add Training",
+            isEditMode ? "Редагувати Тренування" : "Додати Тренування",
             parameters,
             new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
         var result = (await dialog.Result).Data as TrainingViewModel;
@@ -115,7 +115,7 @@
         parameters.Add(x => x.Training, trainingViewModel);
 
         var dialog = DialogService.Show<AddEditTrainingDialog>(
-            isEditMode ? "Edit Training" : "Add Training",
+            isEditMode ? "Редагувати Тренування" : "Додати Тренування",
             parameters,
             new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
         var result = (await dialog.Result).Data as TrainingViewModel;
@@ -134,9 +134,9 @@
     private async Task ConfirmRemoveTraining(TrainingViewModel trainingViewModel)
     {
         var confirmed = await DialogService.ShowMessageBox(
-            "Confirm Deletion",
-            $"Are you sure you want to delete the training: {trainingViewModel.Name}?",
-            yesText: "Yes", cancelText: "No"
+            "Підтвердити видалення",
+            $"Ви впевнені, що хочете видалити тренування: {trainingViewModel.Name}?",
+            yesText: "Так", cancelText: "Ні"
         );
 
         if (confirmed == true)

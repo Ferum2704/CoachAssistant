@@ -1,13 +1,13 @@
 ﻿@using System.Security.Claims
 <MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Домашня сторінка</MudNavLink>
     @if (isCoach)
     {
-        <MudNavGroup Title="Team" Expanded="true">
-            <MudNavLink Href="/teamDetails" Match="NavLinkMatch.Prefix">Team details</MudNavLink>
-            <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Players</MudNavLink>
-            <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Trainings</MudNavLink>
-            <MudNavLink Href="/positions" Match="NavLinkMatch.Prefix">Positions</MudNavLink>
+        <MudNavGroup Title="Команда" Expanded="true">
+            <MudNavLink Href="/teamDetails" Match="NavLinkMatch.Prefix">Деталі</MudNavLink>
+            <MudNavLink Href="/players" Match="NavLinkMatch.Prefix">Гравці</MudNavLink>
+            <MudNavLink Href="/trainings" Match="NavLinkMatch.Prefix">Тренування</MudNavLink>
+            <MudNavLink Href="/positions" Match="NavLinkMatch.Prefix">Позиції</MudNavLink>
         </MudNavGroup>
     }
     @if (isManager)
@@ -16,7 +16,7 @@
     }
     @if (isManager || isCoach)
     {
-        <MudNavGroup Title="Tournaments" Expanded="true">
+        <MudNavGroup Title="Турніри" Expanded="true">
             @foreach (var tournament in TournamentService.Tournaments)
             {
                 <MudNavLink Href="@($"/tournament/{tournament.Id}")">

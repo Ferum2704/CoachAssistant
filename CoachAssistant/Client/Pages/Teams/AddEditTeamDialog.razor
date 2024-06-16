@@ -4,16 +4,16 @@
         <EditForm Model="@Club">
             <MudGrid>
                 <MudItem xs="12">
-                    <MudTextField Label="Name" @bind-Value="Club.Name" />
-                    <MudTextField Label="City" @bind-Value="Club.City" />
-                    <MudTextField Label="Region" @bind-Value="Club.Region" />
-                    <MudTextField Label="Stadium" @bind-Value="Club.Stadium" />
+                    <MudTextField Label="Назва" @bind-Value="Club.Name" />
+                    <MudTextField Label="Населений пункт" @bind-Value="Club.City" />
+                    <MudTextField Label="Регіон" @bind-Value="Club.Region" />
+                    <MudTextField Label="Стадіон" @bind-Value="Club.Stadium" />
                 </MudItem>
             </MudGrid>
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Зберегти</MudButton>
     </DialogActions>
 </MudDialog>
 

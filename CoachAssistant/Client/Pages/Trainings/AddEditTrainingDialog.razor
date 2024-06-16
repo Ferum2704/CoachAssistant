@@ -1,28 +1,39 @@
 ﻿
 <MudDialog>
     <DialogContent>
-        <EditForm Model="@Training">
+        <EditForm Model="@Training" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
             <MudGrid>
                 <MudItem xs="12">
-                     <MudTextField T="string" Label="Назва" @bind-Value="Training.Name" FullWidth />
-                     <MudTextField T="string" Label="Опис" @bind-Value="Training.Description" FullWidth Lines="5" />
-                     <MudDatePicker Label="Дата початку" @bind-Date="Training.StartDate" PickerVariant="PickerVariant.Dialog" />
-                     <MudTextField T="float" Label="Тривалість (в годинах)" @bind-Value="Training.Duration" FullWidth />
-                </MudItem>
+                    <MudCard>
+                        <MudCardContent>
+                            <MudTextField Label="Назва" HelperText="Обов'язкове поле"
+                                          @bind-Value="Training.Name" For="@(() => Training.Name)" FullWidth />
+                             <MudTextField Label="Опис" @bind-Value="Training.Description" FullWidth Lines="5" />
+                             <MudDatePicker Label="Дата початку" PickerVariant="PickerVariant.Dialog"
+                                            @bind-Date="Training.StartDate" For="@(() => Training.StartDate)" />
+                             <MudTimePicker Label="Час початку" TimeFormat="HH:mm" Editable="true"
+                                            @bind-Time="Training.StartTime" For="@(() => Training.StartTime)" />
+                             <MudTextField Label="Тривалість (в годинах)" @bind-Value="Training.Duration" For="@(() => Training.Duration)"
+                                                FullWidth HelperText="Введіть тривалість в годинах" />
+                         </MudCardContent>
+                         <MudCardActions Class="justify-end">
+                             <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Зберегти</MudButton>
+                         </MudCardActions>
+                     </MudCard>
+                 </MudItem>
              </MudGrid>
-        </EditForm>
-    </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="@Save" Color="Color.Primary" Variant="Variant.Filled">Save</MudButton>
-    </DialogActions>
-</MudDialog>
+         </EditForm>
+     </DialogContent>
+ </MudDialog>
 
  @code {
     [Parameter]
     public TrainingViewModel Training { get; set; } = new();
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    private void Save()
+
+    private void OnValidSubmit(EditContext context)
     {
         MudDialog.Close(Training);
     }

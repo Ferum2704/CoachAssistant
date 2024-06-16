@@ -1,5 +1,85 @@
-﻿<h3>PlayerProfile</h3>
+﻿@page "/player-details/{PlayerId}"
+@inject PlayerService PlayerService
+@inject CriterionService CriterionService;
+@inject MatchPlayerActionService MatchPlayerActionService
+@inject ICurrentTeamProvider CurrentTeamProvider
+
+<MudPaper Class="pa-4">
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <MudText Typo="Typo.h5">Ім'я': @Player?.Name @Player?.Surname</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.h6">Пошта: @Player?.Email</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="12">
+                <MudText Typo="Typo.h6">Ріст: @Player?.Height см</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="12">
+            <MudText Typo="Typo.h6"> Вага: @Player?.Weight кг</MudText>
+        </MudItem>
+    </MudGrid>
+    <MudText Typo="Typo.h5" Class="mt-4">Показники гравця на тренуваннях</MudText>
+    @if (Series.Count > 0)
+    {
+        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@options" CanHideSeries />
+    }
+     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadData">Оновити дані</MudButton>
+ </MudPaper>
 
 @code {
+    private TeamViewModel currentTeam;
+    private PlayerViewModel Player { get; set; }
+    private List<ChartSeries> Series = new List<ChartSeries>();
+    private readonly ChartOptions options = new()
+        {
+            YAxisTicks = 1,
+            MaxNumYAxisTicks = 10
+        };
+    private List<ActionTypeViewModel> actionTypes = new();
+    private string[] XAxisLabels;
 
+    [Parameter]
+    public string PlayerId { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadPlayer();
+        LoadData();
+    }
+
+    private async Task LoadPlayer()
+    {
+        actionTypes = await MatchPlayerActionService.GetAllActionTypes();
+        currentTeam = CurrentTeamProvider.CurrentClub.Team;
+        Player = await PlayerService.GetById(currentTeam.Id, PlayerId);
+    }
+
+    private void LoadData()
+    {
+        var trainings = CurrentTeamProvider.CurrentClub.Team.Trainings;
+        XAxisLabels = trainings.OrderBy(x => x.StartDate).Select(t => t.StartDate?.ToString("MMM dd")).ToArray();
+
+        var criteria = CriterionService.Criteria;
+        Series.Clear();
+        Random random = new Random();
+        foreach (var criterion in criteria.Where(x => !actionTypes.Any(a => a.Name == x.Name)))
+        {
+            var seriesData = new List<double>();
+            foreach (var training in trainings)
+            {
+                var trainingRecord = Player.TrainingRecords.FirstOrDefault(tr => tr.TrainingId == training.Id);
+                var mark = trainingRecord?.TrainingMarks.FirstOrDefault(tm => tm.CriterionId == criterion.Id)?.Mark ?? 0;
+
+                seriesData.Add(mark);
+            }
+
+            if (seriesData.Any())
+            {
+                Series.Add(new ChartSeries { Name = criterion.Name, Data = seriesData.ToArray() });
+            }
+        }
+
+        StateHasChanged();
+    }
 }

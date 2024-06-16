@@ -42,7 +42,7 @@
 
         public static string GetPlayersUrl(Guid teamId) => string.Format(PlayersUrl, teamId);
 
-        public static string GetPlayerByIdUrl(Guid teamId, Guid playerId) => $"{string.Format(PlayersUrl, teamId)}/{playerId}";
+        public static string GetPlayerByIdUrl(Guid teamId, string playerId) => $"{string.Format(PlayersUrl, teamId)}/{playerId}";
 
         public static string GetPostPlayerUrl(Guid teamId) => string.Format(PlayersUrl, teamId);
 
