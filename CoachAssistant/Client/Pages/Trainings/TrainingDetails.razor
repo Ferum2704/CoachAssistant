@@ -4,6 +4,7 @@
 @inject TrainingService TrainingService
 @inject TrainingRecordService TrainingRecordService
 @inject IDialogService DialogService
+@inject TeamService TeamService
 
 <MudPaper Class="pa-4">
     @if (training is not null)
@@ -15,12 +16,12 @@
         <MudText Typo="Typo.h5" Class="mt-4 mb-2">Записи гравців на тренуванні</MudText>
         <MudTable Items="@training.TrainingRecords" Dense>
              <HeaderContent>
-                <MudTh Style="width: 50%;">Ім'я гравця'</MudTh>
+                <MudTh Style="width: 50%;">Гравець</MudTh>
                 <MudTh>Присутність</MudTh>
                 <MudTh>Дії</MudTh>
              </HeaderContent>
             <RowTemplate>
-                <MudTd>@($"{context.Player.Name} {context.Player.Surname}")</MudTd>
+             <MudTd>@($"{context.Player.Surname} {context.Player.Name}")</MudTd>
                 <MudTd>
                     <MudIcon Icon="@((context.IsPresent ? Icons.Filled.Check : Icons.Filled.Close))"
                             Color="@(context.IsPresent ? Color.Success : Color.Error)"
@@ -82,12 +83,18 @@
 
     private async Task LoadTraining()
     {
+        if (CurrentTeamProvider.CurrentClub is null)
+        {
+            await TeamService.GetCoachTeam();
+        }
+
         currentTeam = CurrentTeamProvider.CurrentClub.Team;
         training = await TrainingService.GetById(currentTeam.Id, new Guid(TrainingId));
         foreach (var record in training.TrainingRecords)
         {
             record.Player = currentTeam.Players.FirstOrDefault(p => p.Id == record.PlayerId);
         }
+        training.TrainingRecords = training.TrainingRecords.OrderBy(x => x.Player.Surname).ToList();
     }
 
     private async Task SendByEmail(TrainingRecordViewModel record) => await TrainingRecordService.SendRecordByEmail(record.Id);

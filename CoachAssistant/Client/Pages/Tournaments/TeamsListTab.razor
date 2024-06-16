@@ -79,7 +79,7 @@
         parameters.Add(x => x.AvailableTeams, availableTeams);
 
         var dialog = DialogService.Show<SelectTeamsDialog>(
-            "Add team",
+            "Додати команди",
             parameters,
             new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
         var result = (await dialog.Result).Data as IEnumerable<Guid?>;
@@ -106,7 +106,7 @@
     {
         var confirmed = await DialogService.ShowMessageBox(
             "Підтвердити видалення",
-            $"Are you sure you want to remove team from tournament: {club.Name}?",
+            $"Ви впевнені що ви хочете видалити команду {club.Name} з турніру?",
             yesText: "Так", cancelText: "Ні"
         );
 

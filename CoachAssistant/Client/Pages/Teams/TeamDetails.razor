@@ -84,7 +84,7 @@ else
     string GetVerificationText(VerificationState state) => state switch
     {
         VerificationState.NotVerified => "Не верифікована",
-        VerificationState.InProgress => "Верифікаія в очікуванні",
+        VerificationState.InProgress => "Верифікація в очікуванні",
         VerificationState.Verified => "Верифікована",
         _ => "Unknown Status"
     };

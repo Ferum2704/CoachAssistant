@@ -43,6 +43,32 @@ namespace Application.Services
             return mapper.Map<PlayerViewModel>(player);
         }
 
+        public async Task<List<PlayerViewModel>> AddRange(PlayerModel[] models)
+        {
+            List<Player> players = new();
+
+            foreach (var model in models)
+            {
+                var player = new Player()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = model.Name,
+                    Surname = model.Surname,
+                    Weight = model.Weight,
+                    Height = model.Height,
+                    Email = model.Email,
+                    TeamId = model.TeamId.Value,
+                    PhotoPath = model.PhotoPath
+                };
+                players.Add(player);
+            }
+
+            unitOfWork.PlayerRepository.AddRange(players);
+            await unitOfWork.SaveAsync();
+
+            return mapper.Map<List<PlayerViewModel>>(players);
+        }
+
         public async Task Delete(Guid id)
         {
             var player = await unitOfWork.PlayerRepository.GetByIdAsync(id);

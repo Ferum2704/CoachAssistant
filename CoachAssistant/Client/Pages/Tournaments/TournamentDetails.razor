@@ -73,7 +73,7 @@
         var parameters = new DialogParameters<AddEditTournamentDialog>();
         parameters.Add(x => x.Tournament, Tournament);
 
-        var dialog = DialogService.Show<AddEditTournamentDialog>("Edit Team", parameters, options);
+        var dialog = DialogService.Show<AddEditTournamentDialog>("Редагувати Турнір", parameters, options);
         var result = (await dialog.Result).Data as TournamentViewModel;
 
         if (result is not null)

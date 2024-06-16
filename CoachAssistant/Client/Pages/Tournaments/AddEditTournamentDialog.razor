@@ -5,9 +5,9 @@
                 <MudItem xs="12">
                     <MudTextField Label="Назва" @bind-Value="Tournament.Name" />
                     <MudSelect T="string" @bind-Value="Tournament.TournamentType" Variant="Variant.Text">
-                        <MudSelectItem Value="@("Дружній")" />
-                        <MudSelectItem Value="@("Кубок")" />
-                        <MudSelectItem Value="@("Ліга")" />
+                        <MudSelectItem Value="@("Friendly")" />
+                        <MudSelectItem Value="@("LocalLeague")" />
+                        <MudSelectItem Value="@("Cup")" />
                     </MudSelect>
                 </MudItem>
             </MudGrid>

@@ -40,9 +40,9 @@
     List<PositionViewModel> positions = new List<PositionViewModel>();
     Dictionary<Guid, Dictionary<Guid, PositionCriteriaModel>> updatedPositionCriteria = new();
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
-        InitializePositions();
+        await InitializePositions();
     }
 
     private void UpdateWeight(Guid positionId, Guid positionCriterionId, float newWeight)
@@ -91,7 +91,7 @@
         await PositionService.GetAll();
         var isSuccess = updatedPositionCriteria.Remove(positionId);
 
-        InitializePositions();
+        await InitializePositions();
     }
 
     private bool IsDirty(Guid positionId)
@@ -111,9 +111,14 @@
         }
     }
 
-    private void InitializePositions()
+    private async Task InitializePositions()
     {
         positions = PositionService.Positions;
+
+        if (positions.Count == 0)
+        {
+            await PositionService.GetAll();
+        }
 
         foreach (var positionCriteria in positions.SelectMany(x => x.Criteria))
         {

@@ -6,6 +6,11 @@
 @inject IAccountManager AccountManager
 @inject IMapper Mapper
 @inject IDialogService DialogService
+@inject TournamentService TournamentService
+@inject TeamService TeamService
+@inject NavigationManager NavigationManager
+@inject ICurrentTeamProvider CurrentTeamProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView Roles="Manager">
     <Authorized>
@@ -14,14 +19,100 @@
         </MudPaper>
     </Authorized>
 </AuthorizeView>
+<AuthorizeView Roles="Coach">
+    <Authorized>
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudPaper Style="padding: 16px; margin: 16px;">
+                        <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom>Найближчі Тренування</MudText>
+                        @foreach (var training in nextTrainings)
+                        {
+                            <MudCard Style="margin-bottom: 16px; padding: 16px; background-color: #f0f0f0;">
+                                <MudCardContent Style="padding: 8px;">
+                                    <MudText Typo="Typo.subtitle1">@training.Name</MudText>
+                                        <MudText Typo="Typo.body2">@training.StartDate?.ToString("dd MMM yyyy") @training.StartTime?.ToString(@"hh\:mm")</MudText>
+                                    </MudCardContent>
+                                    <MudCardActions Style="justify-content: center;">
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => NavigateToTraining(training.Id)">Переглянути деталі</MudButton>
+                                    </MudCardActions>
+                                </MudCard>
+                        }
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudPaper Style="padding: 16px; margin: 16px;">
+                        <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom>Найближчі Матчі</MudText>
+                        @foreach (var match in nextMatches)
+                        {
+                            <MudCard Style="margin-bottom: 16px; padding: 16px; background-color: #f0f0f0;">
+                                <MudCardContent Style="padding: 8px;">
+                                    <MudText Typo="Typo.subtitle1">@match.MatchTeams.First().Team.Name vs @match.MatchTeams.Last().Team.Name</MudText>
+                                    <MudText Typo="Typo.body2">@match.StartTime.ToString("dd MMM yyyy hh:mm")</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Surface">Tournament: @match.Tournament.Name</MudText>
+                                </MudCardContent>
+                                    <MudCardActions Style="justify-content: center;">
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => NavigateToMatch(match.Id)">Переглянути деталі</MudButton>
+                                    </MudCardActions>
+                                </MudCard>
+                        }
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+
+    </Authorized>
+</AuthorizeView>
 
 @code {
+
+    private List<TrainingViewModel> nextTrainings = new();
+    private List<MatchViewModel> nextMatches = new();
+    private bool isCoach;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        isCoach = await AccountManager.IsUserInRole("Coach");
+
+        if (user.Identity.IsAuthenticated)
+        {
+            if (isCoach)
+            {
+                await TeamService.GetCoachTeam();
+
+                if (CurrentTeamProvider.CurrentClub is not null)
+                {
+                    await TournamentService.LoadTeamTournaments(CurrentTeamProvider.CurrentClub.Team.Id);
+                }
+            }
+        }
+
+        var team = CurrentTeamProvider.CurrentClub?.Team;
+        if (team != null)
+        {
+            nextTrainings = team.Trainings.OrderBy(t => t.StartDate).Take(3).ToList();
+
+            await TournamentService.LoadTeamTournaments(team.Id);
+            var matches = TournamentService.Tournaments
+                .SelectMany(t => t.Matches, (t, m) => { m.Tournament = t; return m; })
+                .Where(m => m.MatchTeams.Any(mt => mt.TeamId == team.Id))
+                .OrderBy(m => m.StartTime)
+                .Take(3)
+                .ToList();
+
+            nextMatches = matches;
+        }
+    }
+
     private async Task OpenAddTournamentDialog()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
         var parameters = new DialogParameters<AddEditTournamentDialog>();
 
-        var dialog = DialogService.Show<AddEditTournamentDialog>("Edit Team", parameters, options);
+        var dialog = DialogService.Show<AddEditTournamentDialog>("Додати турнір", parameters, options);
         var result = (await dialog.Result).Data as TournamentViewModel;
 
         if (result is not null)
@@ -29,5 +120,15 @@
             var newTournament = await TournamentService.Add(Mapper.Map<TournamentModel>(result));
             TournamentService.AddTournament(newTournament);
         }
+    }
+
+    private void NavigateToTraining(Guid trainingId)
+    {
+        NavigationManager.NavigateTo($"/training-details/{trainingId}");
+    }
+
+    private void NavigateToMatch(Guid matchId)
+    {
+        NavigationManager.NavigateTo($"/match/{matchId}");
     }
 }

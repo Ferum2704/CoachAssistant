@@ -63,7 +63,7 @@
     @if (isTeamCoach)
     {
         <MudItem xs="12" Style="text-align: center; margin-top: 20px;">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CalculateLineup">Обрахувати стартовий склад</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(SelectedFormation == "0-0-0")" OnClick="@CalculateLineup">Обрахувати стартовий склад</MudButton>
         </MudItem>
     }
 </MudGrid>

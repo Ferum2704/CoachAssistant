@@ -3,6 +3,7 @@
 @inject IDialogService DialogService
 @inject TrainingService TrainingService
 @inject IMapper Mapper;
+@inject TeamService TeamService
 @inject NavigationManager NavigationManager
 
 <MudGrid Class="pa-4">
@@ -56,10 +57,18 @@
         }
     }
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
-        currentTeam = CurrentTeamProvider.CurrentClub.Team;
-        LoadTrainings();
+        if (CurrentTeamProvider.CurrentClub is null)
+        {
+            await TeamService.GetCoachTeam();
+        }
+
+        if (CurrentTeamProvider.CurrentClub is not null)
+        {
+            currentTeam = CurrentTeamProvider.CurrentClub.Team;
+            LoadTrainings();
+        }
     }
 
     private void LoadTrainings()

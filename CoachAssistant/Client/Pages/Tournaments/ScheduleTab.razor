@@ -8,12 +8,12 @@
     @if (matches == null || matches.Count == 0)
     {
         <MudGrid Justify="Justify.Center" Class="mt-3">
-            <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="@GenerateSchedule" Size="Size.Large">Згенерувати склад</MudButton>
+            <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="@GenerateSchedule" Size="Size.Large">Згенерувати розклад</MudButton>
         </MudGrid>
     }
     else
     {
-        foreach (var match in matches)
+        foreach (var match in matches.OrderBy(x => x.StartTime))
         {
             <MudGrid Justify="Justify.Center">
                 <MudItem xs="10" sm="10" md="10" lg="10">
@@ -22,7 +22,10 @@
                             @match.StartTime.ToString("MMMM dd, yyyy | hh:mm tt") | @match.Location
                         </MudText>
                         <MudText Typo="Typo.h6" Class="mt-2" Style="font-weight: 600;">
-                            @string.Join(" VS ", match.MatchTeams.Select(mt => mt.Team.Name))
+                            @if (true)
+                            {
+                                @string.Join(" VS ", match.MatchTeams.Select(mt => mt.Team.Name))
+                            }
                         </MudText>
                     </MudPaper>
                 </MudItem>

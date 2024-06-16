@@ -4,6 +4,7 @@
 @inject IDialogService DialogService
 @inject ICurrentTeamProvider CurrentTeamProvider
 @inject IMapper Mapper;
+@inject TeamService TeamService
 @inject NavigationManager NavigationManager
 
 <MudPaper Elevation="1" Class="pa-4">
@@ -14,14 +15,14 @@
         <MudItem xs="12">
             <MudTable Items="@players" Dense="true" Striped="true" Bordered="true">
                 <HeaderContent>
-                    <MudTh><MudText Typo="Typo.h6">Ім'я</MudText></MudTh>
                     <MudTh><MudText Typo="Typo.h6">Прізвище</MudText></MudTh>
+                    <MudTh><MudText Typo="Typo.h6">Ім'я</MudText></MudTh>
                     <MudTh><MudText Typo="Typo.h6">Пошта</MudText></MudTh>
                     <MudTh Style="width: 20%"><MudText Typo="Typo.h6"></MudText></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Ім'я">@context.Name</MudTd>
-                    <MudTd DataLabel="Прізвище">@context.Surname</MudTd>
+                    <MudTd DataLabel="Ім'я">@context.Surname</MudTd>
+                    <MudTd DataLabel="Прізвище">@context.Name</MudTd>
                     <MudTd DataLabel="Пошта">@context.Email</MudTd>
                     <MudTd Class="d-flex justify-space-around">
                         <MudButton StartIcon="@Icons.Filled.Edit" Color="Color.Secondary" OnClick="@(() => EditPlayer(context))">Редагувати</MudButton>
@@ -40,10 +41,18 @@
 
     private bool isEditMode;
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
-        currentTeam = CurrentTeamProvider.CurrentClub.Team;
-        players = currentTeam.Players.ToList();
+        if (CurrentTeamProvider.CurrentClub is null)
+        {
+            await TeamService.GetCoachTeam();
+        }
+
+        if (CurrentTeamProvider.CurrentClub is not null)
+        {
+            currentTeam = CurrentTeamProvider.CurrentClub.Team;
+            players = currentTeam.Players.OrderBy(x => x.Surname).ToList();
+        }
     }
 
     private void ViewDetails(PlayerViewModel player)

@@ -1,4 +1,5 @@
 ﻿using CoachAssistant.Client.Network;
+using CoachAssistant.Client.Services.Abstractions;
 using CoachAssistant.Shared.Models;
 using CoachAssistant.Shared.ViewModels;
 
@@ -10,10 +11,12 @@ namespace CoachAssistant.Client.Services
         public Dictionary<Guid, List<ClubViewModel>> TournamentsTeams { get; private set; } = new();
 
         private readonly IHttpClientService httpClientService;
+        private readonly ICurrentTeamProvider currentTeamProvider;
 
-        public TeamService(IHttpClientService httpClientService)
+        public TeamService(IHttpClientService httpClientService, ICurrentTeamProvider currentTeamProvider)
         {
             this.httpClientService = httpClientService;
+            this.currentTeamProvider = currentTeamProvider;
         }
 
         public async Task LoadTeams() =>
@@ -28,6 +31,16 @@ namespace CoachAssistant.Client.Services
             }
 
             return TournamentsTeams[tournamentId];
+        }
+
+        public async Task GetCoachTeam()
+        {
+            var clubViewModel = await httpClientService.GetAsync<ClubViewModel>(ApiUrls.CoachTeamUrl);
+
+            if (clubViewModel is not null)
+            {
+                currentTeamProvider.CurrentClub = clubViewModel;
+            }
         }
 
         public async Task<ClubViewModel> Add(TeamClubModel model) =>

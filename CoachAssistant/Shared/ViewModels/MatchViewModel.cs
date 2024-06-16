@@ -12,6 +12,8 @@
 
         public Guid TournamentId { get; set; }
 
+        public TournamentViewModel Tournament { get; set; }
+
         public IReadOnlyCollection<MatchTeamViewModel> MatchTeams { get; set; }
     }
 }

@@ -3,6 +3,7 @@
 @inject CriterionService CriterionService;
 @inject MatchPlayerActionService MatchPlayerActionService
 @inject ICurrentTeamProvider CurrentTeamProvider
+@inject TeamService TeamService
 
 <MudPaper Class="pa-4">
     <MudGrid>
@@ -44,6 +45,11 @@
 
     protected async override Task OnInitializedAsync()
     {
+        if (CurrentTeamProvider.CurrentClub is null)
+        {
+            await TeamService.GetCoachTeam();
+        }
+
         await LoadPlayer();
         LoadData();
     }

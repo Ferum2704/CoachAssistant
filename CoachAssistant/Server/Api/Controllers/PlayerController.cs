@@ -36,6 +36,19 @@ namespace CoachAssistant.Server.Api.Controllers
             return Ok(playerViewModel);
         }
 
+        [HttpPost("collection")]
+        [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
+        public async Task<IActionResult> PostPlayers(Guid teamId, PlayerModel[] models)
+        {
+            foreach (var model in models)
+            {
+                model.TeamId = teamId;
+            }
+            var playerViewModels = await playerService.AddRange(models);
+
+            return Ok(playerViewModels);
+        }
+
         [HttpGet("{playerId}")]
         [Authorize(Roles = $"{nameof(ApplicationUserRole.Coach)}")]
         public async Task<IActionResult> GetById(Guid playerId)
